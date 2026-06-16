@@ -65,40 +65,69 @@
 }
 
 @keyframes ping-ring {
-  0%   { transform: scale(0.7); opacity: 0.6; }
-  100% { transform: scale(2.6); opacity: 0; }
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  70%  { opacity: 0.3; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+@keyframes ping-ring-outer {
+  0%   { transform: scale(0.6); opacity: 0.5; }
+  100% { transform: scale(5.0); opacity: 0; }
 }
 
 @keyframes beacon-rise {
   0%   { transform: scaleY(0); opacity: 0; transform-origin: bottom; }
-  60%  { opacity: 0.8; }
-  100% { transform: scaleY(1); opacity: 0.6; transform-origin: bottom; }
+  50%  { opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0.85; transform-origin: bottom; }
 }
 
 /* ── 中心フラッシュ ─────────────────────────────────────── */
 @keyframes flash-core {
   0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
-  18%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-  55%  { opacity: 0.8; }
-  100% { opacity: 0; transform: translate(-50%,-50%) scale(2.2); }
+  15%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  50%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(3); }
 }
 @keyframes flash-ring {
-  0%   { opacity: 0.9; transform: translate(-50%,-50%) scale(0.04); }
+  0%   { opacity: 1;   transform: translate(-50%,-50%) scale(0.03); }
   100% { opacity: 0;   transform: translate(-50%,-50%) scale(1); }
 }
-@keyframes flash-ring2 {
-  0%   { opacity: 0.55; transform: translate(-50%,-50%) scale(0.04); }
-  100% { opacity: 0;    transform: translate(-50%,-50%) scale(1); }
-}
 @keyframes flash-spike {
-  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.2); }
-  20%  { opacity: 1; }
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
+  18%  { opacity: 1; }
   100% { opacity: 0; transform: translate(-50%,-50%) scale(1); }
 }
-/* ── 軌道粒子 ───────────────────────────────────────────── */
+@keyframes crosshair-v {
+  0%   { opacity: 0; transform: translateX(-50%) scaleY(0.05); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+}
+@keyframes crosshair-h {
+  0%   { opacity: 0; transform: translateY(-50%) scaleX(0.05); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
+}
+/* 散乱パーティクル（親がrotate、子がtranslateY = 外向き） */
+@keyframes scatter-p {
+  from { transform: translateY(0)     scale(2.5); opacity: 1; }
+  20%  {                               opacity: 1; }
+  60%  {                               opacity: 0.5; }
+  to   { transform: translateY(-80px) scale(0);   opacity: 0; }
+}
+/* エネルギー充電パルス（収束中の中心） */
+@keyframes energy-pulse {
+  0%,100% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.3; }
+  50%     { transform: translate(-50%,-50%) scale(1.5); opacity: 0.85; }
+}
+/* マップ起動スキャンライン */
+@keyframes map-scan {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(220%);  }
+}
+/* 軌道粒子パルス */
 @keyframes particle-pulse {
-  0%,100% { opacity: 0.3; transform: translate(-50%,-50%) scale(0.7); }
-  50%     { opacity: 1;   transform: translate(-50%,-50%) scale(1.4); }
+  0%,100% { opacity: 0.25; transform: translate(-50%,-50%) scale(0.7); }
+  50%     { opacity: 1;    transform: translate(-50%,-50%) scale(1.5); }
 }
 
 /* ── スクロール出現 ─────────────────────────────────────── */

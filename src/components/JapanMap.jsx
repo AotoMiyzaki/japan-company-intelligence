@@ -3,49 +3,61 @@ import { JAPAN_VIEWBOX, PREFECTURE_PATHS } from '../japan-geo'
 
 // 地域ビーコン（光の柱 + ノード + pingリング）
 function Beacon({ r, i, isActive, animateBeacons, tone }) {
-  const beamHeight = 34
+  const beamHeight = 42
   const c = tone.beacon
   const beamStyle = animateBeacons
-    ? { animation: `beacon-rise 0.7s ease ${0.9 + i * 0.18}s both`, transformOrigin: 'bottom' }
+    ? { animation: `beacon-rise 0.65s ease ${0.8 + i * 0.16}s both`, transformOrigin: 'bottom' }
     : undefined
   const groupStyle = animateBeacons
-    ? { animation: `fade-in 0.5s ease ${0.8 + i * 0.18}s both` }
+    ? { animation: `fade-in 0.5s ease ${0.75 + i * 0.16}s both` }
     : undefined
 
   return (
     <g style={groupStyle}>
-      {/* 光の柱 */}
+      {/* 光の柱（幅2px、明るく） */}
       <rect
-        x={r.x - 0.7}
+        x={r.x - 1}
         y={r.y - beamHeight}
-        width={1.4}
+        width={2}
         height={beamHeight}
         fill={`url(#beam-${tone.id})`}
         style={beamStyle}
       />
-      {/* 外周グロー（二層） */}
-      <circle cx={r.x} cy={r.y} r={isActive ? 16 : 11} fill={`url(#glow-outer-${tone.id})`} className="transition-all duration-200" />
-      <circle cx={r.x} cy={r.y} r={isActive ? 9 : 6} fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
-      {/* pingリング */}
+      {/* 外周グロー（三層） */}
+      <circle cx={r.x} cy={r.y} r={isActive ? 22 : 16} fill={`url(#glow-far-${tone.id})`} className="transition-all duration-200" />
+      <circle cx={r.x} cy={r.y} r={isActive ? 13 : 9}  fill={`url(#glow-outer-${tone.id})`} className="transition-all duration-200" />
+      <circle cx={r.x} cy={r.y} r={isActive ? 7 : 5}   fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
+      {/* pingリング（内） */}
       <circle
-        cx={r.x} cy={r.y} r={3}
-        fill="none" stroke={c} strokeWidth="0.9"
+        cx={r.x} cy={r.y} r={3.5}
+        fill="none" stroke={c} strokeWidth="1"
         style={{
           transformOrigin: `${r.x}px ${r.y}px`,
-          animation: 'ping-ring 3s ease-out infinite',
-          animationDelay: `${1.3 + i * 0.24}s`,
+          animation: 'ping-ring 2.8s ease-out infinite',
+          animationDelay: `${1.2 + i * 0.22}s`,
+          opacity: 0,
+        }}
+      />
+      {/* pingリング（外、遅延） */}
+      <circle
+        cx={r.x} cy={r.y} r={3.5}
+        fill="none" stroke={c} strokeWidth="0.6"
+        style={{
+          transformOrigin: `${r.x}px ${r.y}px`,
+          animation: 'ping-ring-outer 3.4s ease-out infinite',
+          animationDelay: `${1.8 + i * 0.22}s`,
           opacity: 0,
         }}
       />
       {/* ノード本体 */}
       <circle
         cx={r.x} cy={r.y}
-        r={isActive ? 3.6 : 2.6}
+        r={isActive ? 4 : 2.8}
         fill={isActive ? c : tone.nodeFill}
         stroke={c}
-        strokeWidth={1.2}
+        strokeWidth={1.4}
         className="transition-all duration-200"
-        style={{ filter: `drop-shadow(0 0 3px ${c})` }}
+        style={{ filter: `drop-shadow(0 0 4px ${c}) drop-shadow(0 0 8px ${c})` }}
       />
     </g>
   )
@@ -118,7 +130,11 @@ export default function JapanMap({
           <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
         </radialGradient>
         <radialGradient id={`glow-outer-${tone.id}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.22 : 0.07} />
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.35 : 0.12} />
+          <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`glow-far-${tone.id}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.15 : 0.04} />
           <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
         </radialGradient>
         {variant === 'dark' && (
