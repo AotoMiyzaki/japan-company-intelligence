@@ -23,12 +23,13 @@ function Beacon({ r, i, isActive, animateBeacons, tone }) {
         fill={`url(#beam-${tone.id})`}
         style={beamStyle}
       />
-      {/* 外周グロー */}
-      <circle cx={r.x} cy={r.y} r={isActive ? 11 : 7} fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
+      {/* 外周グロー（二層） */}
+      <circle cx={r.x} cy={r.y} r={isActive ? 16 : 11} fill={`url(#glow-outer-${tone.id})`} className="transition-all duration-200" />
+      <circle cx={r.x} cy={r.y} r={isActive ? 9 : 6} fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
       {/* pingリング */}
       <circle
         cx={r.x} cy={r.y} r={3}
-        fill="none" stroke={c} strokeWidth="0.7"
+        fill="none" stroke={c} strokeWidth="0.9"
         style={{
           transformOrigin: `${r.x}px ${r.y}px`,
           animation: 'ping-ring 3s ease-out infinite',
@@ -39,11 +40,12 @@ function Beacon({ r, i, isActive, animateBeacons, tone }) {
       {/* ノード本体 */}
       <circle
         cx={r.x} cy={r.y}
-        r={isActive ? 3.4 : 2.4}
+        r={isActive ? 3.6 : 2.6}
         fill={isActive ? c : tone.nodeFill}
         stroke={c}
-        strokeWidth={1}
+        strokeWidth={1.2}
         className="transition-all duration-200"
+        style={{ filter: `drop-shadow(0 0 3px ${c})` }}
       />
     </g>
   )
@@ -78,12 +80,12 @@ export default function JapanMap({
     ? {
         id: 'dark',
         land: '#0E1A3A',
-        landStroke: '#3B6FE0',
-        landStrokeOpacity: 0.55,
+        landStroke: '#4A7FEF',
+        landStrokeOpacity: 0.75,
         grid: '#5B8DEF',
         gridOpacity: 0.07,
         link: '#5B8DEF',
-        linkOpacity: 0.3,
+        linkOpacity: 0.42,
         beacon: '#7DB0FF',
         nodeFill: '#0A1330',
         label: '#9FB8E8',
@@ -109,12 +111,25 @@ export default function JapanMap({
       <defs>
         <linearGradient id={`beam-${tone.id}`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor={tone.beacon} stopOpacity="0" />
-          <stop offset="100%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.85 : 0.5} />
+          <stop offset="100%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.95 : 0.5} />
         </linearGradient>
         <radialGradient id={`glow-${tone.id}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.55 : 0.2} />
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.7 : 0.2} />
           <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
         </radialGradient>
+        <radialGradient id={`glow-outer-${tone.id}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.22 : 0.07} />
+          <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
+        </radialGradient>
+        {variant === 'dark' && (
+          <filter id="land-edge-glow" x="-2%" y="-2%" width="104%" height="104%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        )}
       </defs>
 
       {/* 経緯線グリッド */}
@@ -132,8 +147,9 @@ export default function JapanMap({
         fill={tone.land}
         stroke={tone.landStroke}
         strokeOpacity={tone.landStrokeOpacity}
-        strokeWidth="0.5"
+        strokeWidth="0.6"
         strokeLinejoin="round"
+        filter={variant === 'dark' ? 'url(#land-edge-glow)' : undefined}
       >
         {PREFECTURE_PATHS.map((d, i) => (
           <path key={i} d={d} />
