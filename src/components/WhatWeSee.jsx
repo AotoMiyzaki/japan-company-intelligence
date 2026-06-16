@@ -28,8 +28,8 @@ function LayerCard({ layer, index }) {
       className="reveal panel-card group relative overflow-hidden p-7"
       style={{ transitionDelay: `${index * 120}ms` }}
     >
-      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-signal/10 blur-2xl transition-opacity duration-500 group-hover:bg-signal/20" />
-      <p className="font-display text-xs uppercase tracking-[0.2em] text-signal-bright/70">
+      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-accent/5 blur-2xl transition-opacity duration-500 group-hover:bg-accent/10" />
+      <p className="font-display text-xs uppercase tracking-[0.2em] text-accent/70">
         {layer.tag}
       </p>
       <h3 className="mt-4 font-display text-2xl font-semibold text-ink">{layer.ja}</h3>

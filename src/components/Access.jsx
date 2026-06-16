@@ -26,10 +26,10 @@ export default function Access() {
     <section id="access" className="container-x scroll-mt-24 pb-28 pt-12 sm:pb-36">
       <div
         ref={ref}
-        className="reveal relative overflow-hidden rounded-3xl border border-signal/20 bg-gradient-to-br from-panel2 via-panel to-base p-8 text-center sm:p-14"
+        className="reveal relative overflow-hidden rounded-3xl border border-accent/15 bg-accent/5 p-8 text-center sm:p-14"
       >
-        <div className="absolute inset-0 grid-overlay opacity-30" aria-hidden="true" />
-        <div className="absolute left-1/2 top-0 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal/20 blur-3xl" />
+        <div className="absolute inset-0 grid-overlay opacity-40" aria-hidden="true" />
+        <div className="absolute left-1/2 top-0 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-xl">
           <p className="eyebrow justify-center">早期アクセス</p>
@@ -42,7 +42,7 @@ export default function Access() {
           </p>
 
           {sent ? (
-            <p className="mt-8 rounded-xl border border-signal/30 bg-signal/10 px-5 py-4 text-sm text-signal-bright">
+            <p className="mt-8 rounded-xl border border-accent/25 bg-accent/8 px-5 py-4 text-sm text-accent">
               ありがとうございます。メールクライアントが開き、内容が入力された状態になります。
               確認次第ご連絡いたします。
             </p>
@@ -54,18 +54,18 @@ export default function Access() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ご連絡先メールアドレス"
-                className="flex-1 rounded-full border border-white/12 bg-base/60 px-5 py-3 text-sm text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-signal/60"
+                className="flex-1 rounded-full border border-line bg-white px-5 py-3 text-sm text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-accent"
               />
               <input
                 type="text"
                 value={org}
                 onChange={(e) => setOrg(e.target.value)}
                 placeholder="ファンド名 / 組織名"
-                className="flex-1 rounded-full border border-white/12 bg-base/60 px-5 py-3 text-sm text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-signal/60"
+                className="flex-1 rounded-full border border-line bg-white px-5 py-3 text-sm text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-accent"
               />
               <button
                 type="submit"
-                className="rounded-full bg-signal px-7 py-3 text-sm font-semibold text-base transition-colors hover:bg-signal-bright"
+                className="rounded-full bg-accent px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-soft"
               >
                 申請する
               </button>

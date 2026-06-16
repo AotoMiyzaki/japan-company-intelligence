@@ -55,7 +55,7 @@ export default function InteractiveMap() {
                 <p className="text-sm text-ink-faint">{region.en}</p>
               </div>
               <div className="text-right">
-                <p className="font-display text-3xl font-bold signal-text">
+                <p className="font-display text-3xl font-bold text-accent">
                   {region.companies}
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.15em] text-ink-faint">
@@ -68,14 +68,14 @@ export default function InteractiveMap() {
               {region.themes.map((t) => (
                 <span
                   key={t}
-                  className="rounded-full border border-signal/25 bg-signal/10 px-3 py-1 text-xs font-medium text-signal-bright"
+                  className="rounded-full border border-accent/20 bg-accent/8 px-3 py-1 text-xs font-medium text-accent"
                 >
                   {t}
                 </span>
               ))}
             </div>
 
-            <div className="mt-6 border-t border-white/8 pt-5">
+            <div className="mt-6 border-t border-line pt-5">
               <p className="text-[11px] uppercase tracking-[0.18em] text-ink-faint">
                 現在のシグナル
               </p>
@@ -94,8 +94,8 @@ export default function InteractiveMap() {
                   onMouseLeave={() => setHoverId(null)}
                   className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
                     activeId === r.id
-                      ? 'bg-signal text-base'
-                      : 'bg-white/5 text-ink-muted hover:bg-white/10'
+                      ? 'bg-accent text-white'
+                      : 'bg-mist text-ink-muted hover:bg-mist2'
                   }`}
                 >
                   {r.ja}

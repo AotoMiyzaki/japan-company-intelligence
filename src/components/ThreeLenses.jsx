@@ -38,7 +38,7 @@ function LensCard({ lens, index }) {
       className="reveal panel-card flex flex-col p-7"
       style={{ transitionDelay: `${index * 120}ms` }}
     >
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-signal/25 bg-signal/10 text-signal-bright">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-accent/20 bg-accent/8 text-accent">
         <svg
           viewBox="0 0 24 24"
           fill="none"

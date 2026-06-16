@@ -11,7 +11,7 @@ export default function WhyJapan() {
         lead="4つの構造変化が同時に起きている。機会の大半は、ヘッドラインのインデックスの水面下にある。"
       />
 
-      <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-white/8 bg-white/8 sm:grid-cols-2">
+      <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
         {WHY_JAPAN.map((item, i) => (
           <Reason key={item.ja} item={item} index={i} />
         ))}
@@ -33,8 +33,8 @@ export default function WhyJapan() {
 function Reason({ item, index }) {
   const ref = useReveal()
   return (
-    <div ref={ref} className="reveal bg-base p-7" style={{ transitionDelay: `${index * 90}ms` }}>
-      <p className="font-display text-lg font-semibold text-signal-bright">0{index + 1}</p>
+    <div ref={ref} className="reveal bg-canvas p-7" style={{ transitionDelay: `${index * 90}ms` }}>
+      <p className="font-display text-lg font-semibold text-accent">0{index + 1}</p>
       <h4 className="mt-3 font-display text-lg font-semibold text-ink">{item.ja}</h4>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">{item.desc}</p>
     </div>
