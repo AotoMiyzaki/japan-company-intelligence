@@ -1,17 +1,16 @@
-// Central content & data model for the platform.
-// Region coordinates are expressed in the JapanMap SVG viewBox (0 0 440 560),
-// laid out along Japan's real NE -> SW archipelago diagonal.
+// 全コンテンツの一元管理。英語化時はここと各コンポーネントの固定文言を差し替える。
 
 export const THEMES = [
-  { en: 'Semiconductors', ja: '半導体' },
-  { en: 'Space', ja: '宇宙' },
-  { en: 'AI', ja: 'AI' },
-  { en: 'SaaS', ja: 'SaaS' },
-  { en: 'Banking', ja: '銀行' },
-  { en: 'Defense', ja: '防衛' },
+  { ja: '半導体', en: 'Semiconductors' },
+  { ja: '宇宙', en: 'Space' },
+  { ja: 'AI', en: 'AI' },
+  { ja: 'SaaS', en: 'SaaS' },
+  { ja: '銀行', en: 'Banking' },
+  { ja: '防衛', en: 'Defense' },
 ]
 
-// Lit in this order during the FV (north -> south = a statement of coverage).
+// 地域ビーコンの位置は JapanMap SVG viewBox(0 0 440 560) の座標系。
+// 北→南の順に並べることで「全国をカバーする」宣言を視覚的に表現。
 export const REGIONS = [
   {
     id: 'hokkaido',
@@ -19,9 +18,9 @@ export const REGIONS = [
     ja: '北海道',
     x: 332,
     y: 92,
-    themes: ['Semiconductors', 'Space'],
+    themes: ['半導体', '宇宙'],
     companies: 38,
-    signal: 'A new logic-chip cluster is forming around Chitose as suppliers relocate north.',
+    signal: '千歳周辺に新しい半導体ロジック・クラスターが形成されつつある。サプライヤーの北上が続いている。',
   },
   {
     id: 'tohoku',
@@ -29,9 +28,9 @@ export const REGIONS = [
     ja: '東北',
     x: 300,
     y: 188,
-    themes: ['Semiconductors', 'Defense'],
+    themes: ['半導体', '防衛'],
     companies: 52,
-    signal: 'Precision-parts makers are quietly winning back-end packaging contracts.',
+    signal: '精密部品メーカーが後工程パッケージング案件を静かに取り込みつつある。',
   },
   {
     id: 'kanto',
@@ -39,9 +38,9 @@ export const REGIONS = [
     ja: '関東',
     x: 318,
     y: 268,
-    themes: ['AI', 'SaaS', 'Banking'],
+    themes: ['AI', 'SaaS', '銀行'],
     companies: 214,
-    signal: 'Pre-IPO AI infrastructure startups are clustering around Tokyo and Tsukuba.',
+    signal: 'IPO前のAIインフラスタートアップが東京・つくば周辺にクラスター化している。',
   },
   {
     id: 'chubu',
@@ -49,9 +48,9 @@ export const REGIONS = [
     ja: '中部',
     x: 258,
     y: 282,
-    themes: ['Defense', 'Semiconductors'],
+    themes: ['防衛', '半導体'],
     companies: 96,
-    signal: 'Mobility supply chains are pivoting capital toward power-semiconductor lines.',
+    signal: 'モビリティのサプライチェーンが資本をパワー半導体ラインへシフトしている。',
   },
   {
     id: 'kansai',
@@ -59,9 +58,9 @@ export const REGIONS = [
     ja: '関西',
     x: 214,
     y: 320,
-    themes: ['SaaS', 'Banking'],
+    themes: ['SaaS', '銀行'],
     companies: 118,
-    signal: 'Osaka fintech and vertical-SaaS names are consolidating ahead of expansion.',
+    signal: '大阪のフィンテック・垂直型SaaSが拡大前の再編フェーズに入っている。',
   },
   {
     id: 'chugoku',
@@ -69,9 +68,9 @@ export const REGIONS = [
     ja: '中国',
     x: 158,
     y: 334,
-    themes: ['Defense', 'Space'],
+    themes: ['防衛', '宇宙'],
     companies: 44,
-    signal: 'Shipbuilding and materials firms are entering the defense supply base.',
+    signal: '造船・素材企業が防衛サプライチェーンへの参入を本格化させている。',
   },
   {
     id: 'shikoku',
@@ -81,7 +80,7 @@ export const REGIONS = [
     y: 386,
     themes: ['SaaS', 'AI'],
     companies: 29,
-    signal: 'Regional manufacturers are digitizing fast through home-grown vertical SaaS.',
+    signal: '地域製造業のデジタル化が地場の垂直型SaaSによって急速に進んでいる。',
   },
   {
     id: 'kyushu',
@@ -89,90 +88,84 @@ export const REGIONS = [
     ja: '九州',
     x: 108,
     y: 402,
-    themes: ['Semiconductors', 'Space'],
+    themes: ['半導体', '宇宙'],
     companies: 87,
-    signal: 'The "Silicon Island" foundry build-out is pulling in a wave of suppliers.',
+    signal: '「シリコンアイランド」の工場増設が、現状どの英語スクリーンにも映らないサプライヤー群を動かしている。',
   },
 ]
 
 export const LAYERS = [
   {
     tag: 'Layer 01',
-    en: 'Listed',
     ja: '上場企業',
-    desc: 'Public companies on the TSE and beyond — read through fundamentals, governance reform, and the signals priced in before the market reacts.',
+    desc: '東証上場企業を中心に、ファンダメンタルズ・ガバナンス改革・市場が織り込む前のシグナルを精査します。',
   },
   {
     tag: 'Layer 02',
-    en: 'Emerging & Pre-IPO',
     ja: '上場準備・有力未上場',
-    desc: 'Companies preparing to list and high-potential private names — the pipeline overseas investors rarely see until it is too late.',
+    desc: 'IPOを目前に控えた企業と高ポテンシャルの非上場銘柄——海外投資家が手遅れになるまで気づかないパイプラインです。',
   },
   {
     tag: 'Layer 03',
-    en: 'Hidden Champions',
     ja: '無名の有望企業',
-    desc: 'Unlisted SMEs, regional leaders, and family businesses with world-class niches — the part of Japan that almost never appears in English.',
+    desc: '非上場の中小・地方企業や同族経営の世界水準企業——英語でほぼ情報が存在しない、日本市場の最深部です。',
   },
 ]
 
 export const LENSES = [
   {
     key: 'company',
-    en: 'By Company',
     ja: '企業単位',
-    desc: 'Profile any company across the three layers — financials, ownership, supply chain, and the signals that move it.',
+    desc: '3つのレイヤーを横断しながら企業ごとにプロファイル。財務・株主構成・サプライチェーン・シグナルを一覧します。',
   },
   {
     key: 'region',
-    en: 'By Region',
     ja: '地域単位',
-    desc: 'Trace industrial momentum across eight regions, from Hokkaido to Kyushu, where the real activity happens on the ground.',
+    desc: '北海道から九州まで8地域の産業モメンタムを追跡。現場で何が動いているかを地理的に把握できます。',
   },
   {
     key: 'theme',
-    en: 'By Theme',
     ja: 'テーマ単位',
-    desc: 'Follow a global investment theme — semiconductors, space, AI, defense — down to the Japanese names actually driving it.',
+    desc: '半導体・宇宙・AI・防衛といった世界の投資テーマから、それを実際に牽引している日本の銘柄へ直接アクセスします。',
   },
 ]
 
 export const SAMPLE_SIGNAL = {
-  kicker: 'Featured Signal',
-  region: 'Kyushu',
-  theme: 'Semiconductors',
-  title: '"Silicon Island" is pulling its supply base out of the shadows',
+  kicker: 'シグナル例',
+  region: '九州',
+  theme: '半導体',
+  title: '「シリコンアイランド」が、影に隠れたサプライチェーンを動かし始めている',
   summary:
-    'A foundry build-out in northern Kyushu is rerouting capital, talent, and orders into a tier of unlisted suppliers that no English-language screen currently surfaces. We map the cluster, the listed proxies, and three pre-IPO names positioned to benefit first.',
+    '九州北部の工場増設が、現存するいかなる英語スクリーンにも映らない非上場サプライヤー群への資金・人材・発注をルーティングし直している。クラスター全体をマッピングし、上場プロキシ銘柄と先行受益が期待される3つのIPO前銘柄を特定します。',
   metrics: [
-    { label: 'Companies mapped', value: '87' },
-    { label: 'Pre-IPO flagged', value: '3' },
-    { label: 'Listed proxies', value: '11' },
+    { label: 'マップ済み企業数', value: '87' },
+    { label: 'IPO前候補', value: '3社' },
+    { label: '上場プロキシ', value: '11社' },
   ],
 }
 
 export const WHY_JAPAN = [
   {
-    en: 'A re-rating in motion',
-    desc: 'Exchange-led governance reform and capital-efficiency pressure are forcing change at thousands of listed companies at once.',
+    ja: '進行中の市場再評価',
+    desc: '東証主導のガバナンス改革と資本効率改善圧力が、数千社の上場企業を同時に変えつつあります。',
   },
   {
-    en: 'A currency-driven entry point',
-    desc: 'A weak yen has reset valuations for foreign capital across both public and private assets.',
+    ja: '通貨安が生んだ参入機会',
+    desc: '円安が海外資本にとって上場・非上場の双方で一斉にバリュエーションをリセットしています。',
   },
   {
-    en: 'A succession wave',
-    desc: 'An aging owner generation is putting profitable, unlisted businesses into play for the first time in decades.',
+    ja: '事業承継の大波',
+    desc: 'オーナー経営者世代の高齢化が、数十年ぶりに黒字の非上場企業を市場に出し始めています。',
   },
   {
-    en: 'Hidden technical depth',
-    desc: 'Regional and unlisted firms hold defensible niches in materials, components, and precision manufacturing — largely invisible in English.',
+    ja: '英語圏が見落としている技術の深度',
+    desc: '地方・非上場企業が素材・部品・精密加工で持つ守りやすい優位性は、英語ではほとんど情報がありません。',
   },
 ]
 
 export const AUDIENCES = [
-  { en: 'Funds', desc: 'Sharpen the thesis and source names before they are consensus.' },
-  { en: 'Institutional Investors', desc: 'Cover Japan with depth across listed and pre-listed assets.' },
-  { en: 'Family Offices', desc: 'Find durable, owner-led businesses with structural moats.' },
-  { en: 'Corporates', desc: 'Map partners, targets, and supply chains region by region.' },
+  { ja: 'ファンド', desc: 'コンセンサスになる前に、テーマと銘柄を絞り込む。' },
+  { ja: '機関投資家', desc: '上場・上場準備銘柄を横断して日本をカバーする。' },
+  { ja: 'ファミリーオフィス', desc: '構造的な優位を持つ、オーナー系の耐久性ある企業を見つける。' },
+  { ja: '事業会社', desc: 'パートナー・M&A候補・サプライチェーンを地域ごとにマッピングする。' },
 ]

@@ -18,12 +18,12 @@ export default function SampleSignal() {
           <div className="flex flex-wrap items-center gap-3">
             <span className="eyebrow">{s.kicker}</span>
             <span className="text-ink-faint">·</span>
-            <span className="text-xs font-500 text-signal-bright">{s.region}</span>
+            <span className="text-xs font-medium text-signal-bright">{s.region}</span>
             <span className="text-ink-faint">·</span>
-            <span className="text-xs font-500 text-gold">{s.theme}</span>
+            <span className="text-xs font-medium text-gold">{s.theme}</span>
           </div>
 
-          <h3 className="mt-5 max-w-3xl font-display text-2xl font-700 leading-snug text-ink sm:text-3xl">
+          <h3 className="mt-5 max-w-3xl font-display text-2xl font-bold leading-snug text-ink sm:text-3xl">
             {s.title}
           </h3>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-muted">
@@ -33,7 +33,7 @@ export default function SampleSignal() {
           <div className="mt-9 grid max-w-lg grid-cols-3 gap-6">
             {s.metrics.map((m) => (
               <div key={m.label}>
-                <p className="font-display text-3xl font-700 signal-text">{m.value}</p>
+                <p className="font-display text-3xl font-bold signal-text">{m.value}</p>
                 <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-faint">
                   {m.label}
                 </p>
@@ -44,12 +44,12 @@ export default function SampleSignal() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="#access"
-              className="rounded-full bg-signal px-6 py-2.5 text-sm font-600 text-base transition-colors hover:bg-signal-bright"
+              className="rounded-full bg-signal px-6 py-2.5 text-sm font-semibold text-base transition-colors hover:bg-signal-bright"
             >
-              Read the full signal
+              シグナル全文を読む
             </a>
             <span className="text-xs text-ink-faint">
-              Sample shown for illustration.
+              ※ 例示目的で作成したサンプルです。
             </span>
           </div>
         </div>

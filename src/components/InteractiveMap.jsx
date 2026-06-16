@@ -11,20 +11,19 @@ export default function InteractiveMap() {
   const region = REGIONS.find((r) => r.id === activeId) || REGIONS[0]
 
   const headingRef = useReveal()
-  const bodyRef = useReveal()
+  const bodyRef    = useReveal()
 
   return (
     <section id="explore" className="relative scroll-mt-24 py-24 sm:py-32">
       <div className="container-x">
         <div ref={headingRef} className="reveal max-w-2xl">
-          <p className="eyebrow">Explore</p>
-          <h2 className="mt-4 font-display text-3xl font-700 leading-tight tracking-tight sm:text-4xl">
-            Eight regions. One industrial map.
+          <p className="eyebrow">探る</p>
+          <h2 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            8地域。ひとつの産業地図。
           </h2>
           <p className="mt-4 text-base leading-relaxed text-ink-muted sm:text-lg">
-            Hover or tap a region to see what is moving on the ground — the
-            themes in play, the companies we track, and a live read on the
-            signal.
+            地域をホバー・タップすると、現場で動いているテーマ、追跡企業数、
+            現在のシグナルを確認できます。
           </p>
         </div>
 
@@ -32,7 +31,7 @@ export default function InteractiveMap() {
           ref={bodyRef}
           className="reveal mt-14 grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]"
         >
-          {/* Map */}
+          {/* 地図 */}
           <div className="relative mx-auto w-full max-w-[460px]">
             <JapanMap
               className="h-full w-full"
@@ -46,21 +45,21 @@ export default function InteractiveMap() {
             />
           </div>
 
-          {/* Read-out panel */}
+          {/* 情報パネル */}
           <div className="panel-card p-7 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <div>
-                <h3 className="font-display text-2xl font-700 text-ink">
-                  {region.en}
+                <h3 className="font-display text-2xl font-bold text-ink">
+                  {region.ja}
                 </h3>
-                <p className="text-sm text-ink-faint">{region.ja}</p>
+                <p className="text-sm text-ink-faint">{region.en}</p>
               </div>
               <div className="text-right">
-                <p className="font-display text-3xl font-700 signal-text">
+                <p className="font-display text-3xl font-bold signal-text">
                   {region.companies}
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.15em] text-ink-faint">
-                  companies tracked
+                  追跡企業数
                 </p>
               </div>
             </div>
@@ -69,7 +68,7 @@ export default function InteractiveMap() {
               {region.themes.map((t) => (
                 <span
                   key={t}
-                  className="rounded-full border border-signal/25 bg-signal/10 px-3 py-1 text-xs font-500 text-signal-bright"
+                  className="rounded-full border border-signal/25 bg-signal/10 px-3 py-1 text-xs font-medium text-signal-bright"
                 >
                   {t}
                 </span>
@@ -78,13 +77,14 @@ export default function InteractiveMap() {
 
             <div className="mt-6 border-t border-white/8 pt-5">
               <p className="text-[11px] uppercase tracking-[0.18em] text-ink-faint">
-                Current signal
+                現在のシグナル
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink">
                 {region.signal}
               </p>
             </div>
 
+            {/* 地域切替ボタン */}
             <div className="mt-6 flex flex-wrap gap-2">
               {REGIONS.map((r) => (
                 <button
@@ -98,7 +98,7 @@ export default function InteractiveMap() {
                       : 'bg-white/5 text-ink-muted hover:bg-white/10'
                   }`}
                 >
-                  {r.en}
+                  {r.ja}
                 </button>
               ))}
             </div>
@@ -106,7 +106,7 @@ export default function InteractiveMap() {
         </div>
 
         <p className="mt-6 text-xs text-ink-faint">
-          Figures are illustrative of the platform and not investment advice.
+          表示数値はプラットフォームの例示であり、投資助言ではありません。
         </p>
       </div>
     </section>

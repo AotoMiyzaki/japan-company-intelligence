@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
 const LINKS = [
-  { href: '#layers', label: 'What We See' },
-  { href: '#lenses', label: 'Three Lenses' },
-  { href: '#explore', label: 'Explore' },
-  { href: '#signal', label: 'Research' },
-  { href: '#why', label: 'Why Japan' },
+  { href: '#layers',   label: '私たちが見ているもの' },
+  { href: '#lenses',   label: '3つの視点' },
+  { href: '#explore',  label: '探る' },
+  { href: '#signal',   label: 'リサーチ' },
+  { href: '#why',      label: 'なぜ今、日本か' },
 ]
 
 export default function Nav() {
@@ -30,7 +30,7 @@ export default function Nav() {
             <span className="absolute inline-flex h-full w-full rounded-full bg-signal opacity-70 animate-breathe" />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-signal-bright" />
           </span>
-          <span className="font-display text-sm font-600 tracking-tight text-ink">
+          <span className="font-display text-sm font-semibold tracking-tight text-ink">
             Japan Company Intelligence
           </span>
         </a>
@@ -49,9 +49,9 @@ export default function Nav() {
 
         <a
           href="#access"
-          className="rounded-full border border-signal/40 px-4 py-1.5 text-sm font-500 text-signal-bright transition-colors hover:bg-signal hover:text-base"
+          className="rounded-full border border-signal/40 px-4 py-1.5 text-sm font-medium text-signal-bright transition-colors hover:bg-signal hover:text-base"
         >
-          Early access
+          早期アクセス
         </a>
       </nav>
     </div>
