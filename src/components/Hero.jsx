@@ -3,224 +3,208 @@ import { FV_THEMES } from '../data'
 import { usePrefersReducedMotion } from '../hooks'
 import JapanMap from './JapanMap'
 
-// ── フェーズ定義（マウントからの ms） ─────────────────────────────────
-// 0: 静止（軌道リング）
-// 1: テーマが軌道上に出現・回転
-// 2: 回転が減速しながら収束
-// 3: 日本列島が出現、ビーコン点灯
-// 4: テーマ消去・列島安定
-// 5: メインコピー
-// 6: サブコピー
-// 7: CTAボタン
-const TIMELINE = [800, 2600, 4400, 5800, 7000, 8000, 9000]
+// ── フェーズ（マウントからの ms） ───────────────────────────────
+// 0: 静止  1: テーマが軌道上を回転  2: 回転しながら中心へ収束(列島へ接続)
+// 3: 日本列島出現・ビーコン点灯  4: テーマ消去  5: メイン  6: サブ  7: CTA
+const TIMELINE = [600, 3400, 4900, 6200, 7300, 8300, 9300]
 
-// 軌道リングのパラメータ（画面幅に依存しないよう相対値で定義）
-const RX = 36  // 楕円の X 半径（ビューポート % に対する相対値）
-const RY = 14  // 楕円の Y 半径（%）
-
-// 各テーマを楕円上に均等配置
-function getOrbitPos(index, total, rx = RX, ry = RY) {
-  const angle = (index / total) * 2 * Math.PI - Math.PI / 2 // 12時から開始
-  return {
-    x: 50 + rx * Math.cos(angle),
-    y: 42 + ry * Math.sin(angle),
-  }
-}
-
-// テーマ数
 const N = FV_THEMES.length
+const ORBIT_SPEED = 0.22   // rad/s（ゆっくり）
+const CONVERGE_MS = 1400   // 中心へ吸い込まれる時間
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
   const [phase, setPhase] = useState(0)
 
+  const stageRef = useRef(null)
+  const chipRefs = useRef([])
+  const dims = useRef({ rx: 320, ry: 150 })
+  const convergeStart = useRef(null)
+
+  // フェーズタイマー
   useEffect(() => {
     if (reduced) { setPhase(7); return }
     const timers = TIMELINE.map((t, i) => setTimeout(() => setPhase(i + 1), t))
     return () => timers.forEach(clearTimeout)
   }, [reduced])
 
-  const showOrbit    = phase >= 1
-  const converging   = phase >= 2
-  const showMap      = phase >= 3
-  const themesGone   = phase >= 4
-  const mapDimmed    = phase >= 5
-  const showMain     = phase >= 5
-  const showSub      = phase >= 6
-  const showCTA      = phase >= 7
+  // 収束開始時刻を記録
+  useEffect(() => {
+    if (phase === 2) convergeStart.current = performance.now()
+  }, [phase])
+
+  // 楕円半径をステージサイズから算出（レスポンシブ）
+  useEffect(() => {
+    const update = () => {
+      const el = stageRef.current
+      if (!el) return
+      const w = el.clientWidth
+      const h = el.clientHeight
+      dims.current = {
+        rx: Math.min(w * 0.42, 430),
+        ry: Math.min(h * 0.40, 190),
+      }
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  // ── 軌道アニメーション（requestAnimationFrame + DOM直接更新） ──
+  useEffect(() => {
+    if (reduced) return
+    let raf
+    const start = performance.now()
+    const loop = (now) => {
+      const t = (now - start) / 1000
+      const { rx, ry } = dims.current
+
+      // 収束係数（収束開始後 CONVERGE_MS で 1→0 へ）
+      let factor = 1
+      if (convergeStart.current != null) {
+        const e = (now - convergeStart.current) / CONVERGE_MS
+        factor = Math.max(0, 1 - e)
+      }
+
+      for (let i = 0; i < N; i++) {
+        const el = chipRefs.current[i]
+        if (!el) continue
+        const base = (i / N) * Math.PI * 2 - Math.PI / 2
+        const theta = base + t * ORBIT_SPEED
+        const x = rx * Math.cos(theta) * factor
+        const y = ry * Math.sin(theta) * factor
+        el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`
+      }
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [reduced])
+
+  const showOrbit  = phase >= 1
+  const converging = phase >= 2
+  const showMap    = phase >= 3
+  const themesGone = phase >= 4
+  const mapDimmed  = phase >= 5
+  const showMain   = phase >= 5
+  const showSub    = phase >= 6
+  const showCTA    = phase >= 7
 
   return (
-    <header className="relative isolate min-h-[100svh] overflow-hidden bg-canvas">
+    <header className="relative isolate min-h-[100svh] overflow-hidden bg-[#06091A] text-white">
 
-      {/* 薄いデータグリッド */}
-      <div className="absolute inset-0 grid-overlay opacity-60" aria-hidden="true" />
-
-      {/* 淡いアクセントグラデーション */}
+      {/* データグリッド背景 */}
       <div
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 68% 50% at 50% 40%, rgba(0,14,153,0.05), transparent 70%)' }}
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(91,141,239,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(91,141,239,0.07) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+        aria-hidden="true"
+      />
+      {/* 中央のアクセントグロー */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse 70% 55% at 50% 40%, rgba(0,14,153,0.45), transparent 72%)' }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse 40% 30% at 50% 40%, rgba(91,141,239,0.18), transparent 70%)' }}
         aria-hidden="true"
       />
 
-      {/* ══════════════════════════════════════════
-          全画面アニメーション・ステージ
-          ══════════════════════════════════════════ */}
-      <div className="absolute inset-0" aria-hidden="true">
+      {/* ════════ アニメーション・ステージ ════════ */}
+      <div ref={stageRef} className="absolute inset-0" aria-hidden="true">
 
-        {/* 軌道リング（SVG、フェーズ0〜2） */}
+        {/* 静かな起点（phase 0） */}
+        <div
+          className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2"
+          style={{ opacity: phase === 0 ? 1 : 0, transition: 'opacity 0.6s ease' }}
+        >
+          <span className="relative flex h-4 w-4 items-center justify-center">
+            <span className="absolute h-8 w-8 rounded-full" style={{ background: 'rgba(125,176,255,0.25)', animation: 'breathe 3.2s ease-in-out infinite' }} />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#7DB0FF]" style={{ boxShadow: '0 0 16px 4px rgba(125,176,255,0.6)' }} />
+          </span>
+        </div>
+
+        {/* 軌道トラック（楕円リング） */}
         <svg
           className="absolute inset-0 h-full w-full"
-          style={{
-            opacity: showOrbit && !themesGone ? 1 : 0,
-            transition: 'opacity 0.8s ease',
-          }}
+          style={{ opacity: showOrbit && !themesGone ? 1 : 0, transition: 'opacity 0.8s ease' }}
           preserveAspectRatio="none"
         >
-          {/* 外側楕円（メイン軌道） */}
-          <ellipse
-            cx="50%" cy="42%"
-            rx={`${RX}%`} ry={`${RY}%`}
-            fill="none"
-            stroke="#000E99" strokeOpacity="0.14" strokeWidth="1"
-            strokeDasharray="7 5"
-          />
-          {/* 内側の補助楕円（奥行き感） */}
-          <ellipse
-            cx="50%" cy="42%"
-            rx={`${RX * 0.55}%`} ry={`${RY * 0.55}%`}
-            fill="none"
-            stroke="#000E99" strokeOpacity="0.07" strokeWidth="0.8"
-          />
-          {/* 軌道上の矢印（回転方向の暗示） */}
-          {[0.15, 0.4, 0.65, 0.88].map((t, i) => {
-            const angle = t * 2 * Math.PI
-            const cx = 50 + RX * Math.cos(angle)
-            const cy = 42 + RY * Math.sin(angle)
-            const tangentAngle = Math.atan2(
-              -RX * Math.sin(angle) / RY,
-              RY * Math.cos(angle) / RX
-            ) * (180 / Math.PI) + 90
-            return (
-              <g
-                key={i}
-                transform={`translate(${cx}%, ${cy}%) rotate(${tangentAngle})`}
-                opacity="0.2"
-              >
-                <polygon points="0,-5 4,3 -4,3" fill="#000E99" />
-              </g>
-            )
-          })}
-          {/* 中心の十字 */}
-          <line x1="49.4%" y1="42%" x2="50.6%" y2="42%" stroke="#000E99" strokeOpacity="0.15" strokeWidth="1" />
-          <line x1="50%" y1="40.6%" x2="50%" y2="43.4%" stroke="#000E99" strokeOpacity="0.15" strokeWidth="1" />
+          <ellipse cx="50%" cy="40%" rx="42%" ry="40%" fill="none" stroke="#5B8DEF" strokeOpacity="0.16" strokeWidth="1" strokeDasharray="6 6" />
+          <ellipse cx="50%" cy="40%" rx="24%" ry="22%" fill="none" stroke="#5B8DEF" strokeOpacity="0.08" strokeWidth="1" />
         </svg>
 
-        {/* テーマタグ — 軌道配置 → 中央収束 → フェード */}
-        {FV_THEMES.map((ja, i) => {
-          const pos = getOrbitPos(i, N)
-          const targetX = converging ? 50 : pos.x
-          const targetY = converging ? 42 : pos.y
-          const opacity = !showOrbit ? 0 : themesGone ? 0 : 1
-
-          // 収束時に微妙なずれを出して消える（重なりすぎない）
-          const offsetX = converging ? (i % 3 - 1) * 1.5 : 0
-          const offsetY = converging ? (Math.floor(i / 3) % 2 - 0.5) * 2 : 0
-
-          return (
+        {/* テーマチップ（軌道上を回転） */}
+        <div className="absolute left-1/2 top-[40%] h-0 w-0">
+          {FV_THEMES.map((ja, i) => (
             <div
               key={ja}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
+              ref={(el) => (chipRefs.current[i] = el)}
+              className="absolute left-0 top-0 will-change-transform"
               style={{
-                left: `${targetX + offsetX}%`,
-                top:  `${targetY + offsetY}%`,
-                opacity,
-                transition: [
-                  `left 1.8s cubic-bezier(0.4,0,0.2,1) ${i * 0.035}s`,
-                  `top  1.8s cubic-bezier(0.4,0,0.2,1) ${i * 0.035}s`,
-                  `opacity 0.6s ease ${showOrbit && !converging ? i * 0.1 : 0}s`,
-                ].join(', '),
+                opacity: !showOrbit ? 0 : themesGone ? 0 : 1,
+                transition: 'opacity 0.6s ease',
               }}
             >
-              <div className="whitespace-nowrap rounded-full border border-accent/30 bg-white px-3.5 py-1.5 shadow-sm">
-                <span className="font-display text-sm font-semibold text-accent">{ja}</span>
+              <div className="whitespace-nowrap rounded-full border border-[#5B8DEF]/40 bg-[#0C1430]/80 px-3.5 py-1.5 backdrop-blur-sm shadow-[0_0_18px_rgba(0,14,153,0.4)]">
+                <span className="font-display text-sm font-semibold text-[#CFE0FF]">{ja}</span>
               </div>
             </div>
-          )
-        })}
+          ))}
+        </div>
 
-        {/* 回転するダミー要素（楕円軌道に沿った動き感を演出）
-            — 実際のテーマとは別に、軌道上を動くドット群 */}
-        {showOrbit && !converging && !reduced && (
-          <div
-            className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2"
-            style={{ width: '72vw', height: '28vw', animation: 'orbit 28s linear infinite' }}
-          >
-            {[0.08, 0.33, 0.58, 0.83].map((t, i) => {
-              const a = t * 2 * Math.PI
-              const x = 50 + 50 * Math.cos(a)  // % of container
-              const y = 50 + 50 * Math.sin(a)
-              return (
-                <div
-                  key={i}
-                  className="absolute h-1.5 w-1.5 rounded-full bg-accent"
-                  style={{
-                    left: `${x}%`, top: `${y}%`,
-                    opacity: 0.2,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
-              )
-            })}
-          </div>
-        )}
-
-        {/* 日本列島 */}
+        {/* 日本列島（ダーク版） */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
+          className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2"
           style={{
-            top: '42%',
-            width: 'min(500px, 76vw)',
-            aspectRatio: '500 / 590',
-            opacity:   showMap ? (mapDimmed ? 0.4 : 1) : 0,
-            transform: `translate(-50%, -50%) scale(${showMap ? 1 : 0.88})`,
-            transition: 'opacity 1.4s ease, transform 1.2s cubic-bezier(0.16,1,0.3,1)',
+            width: 'min(440px, 72vw)',
+            aspectRatio: '438 / 516',
+            opacity: showMap ? (mapDimmed ? 0.5 : 1) : 0,
+            transform: `translate(-50%, -50%) scale(${showMap ? 1 : 0.86})`,
+            transition: 'opacity 1.3s ease, transform 1.1s cubic-bezier(0.16,1,0.3,1)',
+            filter: 'drop-shadow(0 0 24px rgba(91,141,239,0.25))',
           }}
         >
-          <JapanMap
-            className="h-full w-full"
-            lit={showMap}
-            animateBeacons={!reduced && showMap}
-          />
+          <JapanMap variant="dark" className="h-full w-full" lit={showMap} animateBeacons={!reduced && showMap} />
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          コピーレイヤー（アニメーション後に表示）
-          ══════════════════════════════════════════ */}
+      {/* ════════ コピーレイヤー ════════ */}
       <div className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-24 text-center sm:pb-32">
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[56%] bg-gradient-to-t from-canvas via-canvas/88 to-transparent"
-          style={{ opacity: showMain ? 1 : 0, transition: 'opacity 1.2s ease' }}
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[56%]"
+          style={{
+            background: 'linear-gradient(to top, #06091A 18%, rgba(6,9,26,0.85) 55%, transparent)',
+            opacity: showMain ? 1 : 0, transition: 'opacity 1.2s ease',
+          }}
           aria-hidden="true"
         />
 
         <div className="relative z-10 w-full max-w-3xl">
-          <p className="eyebrow justify-center" style={fade(showMain, 0)}>
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" style={{ animation: 'breathe 3.5s ease-in-out infinite' }} />
+          <p
+            className="inline-flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7DB0FF]"
+            style={fade(showMain, 0)}
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#7DB0FF]" style={{ animation: 'breathe 3.5s ease-in-out infinite' }} />
             Japan Company Intelligence
           </p>
 
           <h1
-            className="mt-5 font-display text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-[3.4rem]"
+            className="mt-5 font-display text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]"
             style={fade(showMain, 0.08)}
           >
             日本の産業シグナルを、
             <br />
-            <span className="text-accent">市場が気づく前に。</span>
+            <span className="text-[#7DB0FF]">市場が気づく前に。</span>
           </h1>
 
           <p
-            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg"
+            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#AEBBD6] sm:text-lg"
             style={fade(showSub, 0)}
           >
             半導体、宇宙、AI、防衛などの世界的な投資テーマを、
@@ -228,19 +212,17 @@ export default function Hero() {
             日本各地の企業・地域・産業構造と結びつけて読み解くリサーチプラットフォーム。
           </p>
 
-          <div
-            className="mt-8 flex flex-wrap items-center justify-center gap-4"
-            style={fade(showCTA, 0)}
-          >
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4" style={fade(showCTA, 0)}>
             <a
               href="#access"
-              className="rounded-full bg-accent px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-soft"
+              className="rounded-full bg-[#2A3CD6] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3D50E8]"
+              style={{ boxShadow: '0 0 24px rgba(42,60,214,0.5)' }}
             >
               早期アクセスを申請
             </a>
             <a
               href="#explore"
-              className="rounded-full border border-line px-7 py-3 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+              className="rounded-full border border-white/20 px-7 py-3 text-sm font-medium text-white transition-colors hover:border-[#7DB0FF] hover:text-[#7DB0FF]"
             >
               マップを見る
             </a>
@@ -251,12 +233,12 @@ export default function Hero() {
       {/* スクロール誘導 */}
       <div
         className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2"
-        style={{ opacity: showCTA ? 0.7 : 0, transition: 'opacity 1.2s ease' }}
+        style={{ opacity: showCTA ? 0.6 : 0, transition: 'opacity 1.1s ease' }}
         aria-hidden="true"
       >
-        <div className="flex flex-col items-center gap-2 text-ink-faint">
+        <div className="flex flex-col items-center gap-2 text-[#6E7EA6]">
           <span className="text-[9px] uppercase tracking-[0.32em]">スクロール</span>
-          <span className="h-7 w-px bg-gradient-to-b from-accent/40 to-transparent" />
+          <span className="h-7 w-px bg-gradient-to-b from-[#5B8DEF]/60 to-transparent" />
         </div>
       </div>
     </header>
@@ -265,7 +247,7 @@ export default function Hero() {
 
 function fade(visible, delay = 0) {
   return {
-    opacity:   visible ? 1 : 0,
+    opacity: visible ? 1 : 0,
     transform: visible ? 'translateY(0)' : 'translateY(16px)',
     transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
   }

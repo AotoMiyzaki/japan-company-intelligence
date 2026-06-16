@@ -1,5 +1,7 @@
 // 全コンテンツの一元管理。英語化時はここと各コンポーネントの固定文言を差し替える。
 
+import { REGION_NODES } from './japan-geo'
+
 // 代表テーマ（10）。サイト主言語は日本語、enは小ラベル用。
 export const THEMES = [
   { ja: '半導体', en: 'Semiconductors' },
@@ -19,90 +21,63 @@ export const FV_THEMES = [
   '半導体', 'AI', '防衛', '宇宙', 'エネルギー', '蓄電池', 'ロボティクス', '金融',
 ]
 
-// 地域ノードの位置は JapanMap SVG viewBox(0 0 480 600) の座標系。
-// 日本列島シルエット上に配置し、北→南の順で「全国カバー」を表現。
-export const REGIONS = [
+// 地域コンテンツ。座標(x,y)は japan-geo.js（実地図データ由来）から自動付与する。
+const REGION_CONTENT = [
   {
-    id: 'hokkaido',
-    en: 'Hokkaido',
-    ja: '北海道',
-    x: 366,
-    y: 96,
+    id: 'hokkaido', en: 'Hokkaido', ja: '北海道',
     themes: ['半導体', '宇宙'],
     companies: 38,
     signal: '千歳周辺に新しい半導体ロジック・クラスターが形成されつつある。サプライヤーの北上が続いている。',
   },
   {
-    id: 'tohoku',
-    en: 'Tohoku',
-    ja: '東北',
-    x: 340,
-    y: 182,
+    id: 'tohoku', en: 'Tohoku', ja: '東北',
     themes: ['半導体', 'エネルギー'],
     companies: 52,
     signal: '精密部品メーカーが後工程パッケージング案件を取り込みつつ、再エネ関連投資も拡大している。',
   },
   {
-    id: 'kanto',
-    en: 'Kanto',
-    ja: '関東',
-    x: 360,
-    y: 256,
+    id: 'kanto', en: 'Kanto', ja: '関東',
     themes: ['AI', '金融'],
     companies: 214,
     signal: 'IPO前のAIインフラスタートアップが東京・つくば周辺にクラスター化している。',
   },
   {
-    id: 'chubu',
-    en: 'Chubu',
-    ja: '中部',
-    x: 300,
-    y: 282,
+    id: 'chubu', en: 'Chubu', ja: '中部',
     themes: ['ロボティクス', '蓄電池'],
     companies: 96,
     signal: 'モビリティのサプライチェーンが資本を蓄電池・産業ロボットへシフトしている。',
   },
   {
-    id: 'kansai',
-    en: 'Kansai',
-    ja: '関西',
-    x: 250,
-    y: 308,
+    id: 'kansai', en: 'Kansai', ja: '関西',
     themes: ['蓄電池', '金融'],
     companies: 118,
     signal: '大阪の素材・電池関連と金融が、拡大前の再編フェーズに入っている。',
   },
   {
-    id: 'chugoku',
-    en: 'Chugoku',
-    ja: '中国',
-    x: 174,
-    y: 326,
+    id: 'chugoku', en: 'Chugoku', ja: '中国',
     themes: ['造船', '防衛'],
     companies: 44,
     signal: '造船・素材企業が防衛サプライチェーンへの参入を本格化させている。',
   },
   {
-    id: 'shikoku',
-    en: 'Shikoku',
-    ja: '四国',
-    x: 222,
-    y: 378,
+    id: 'shikoku', en: 'Shikoku', ja: '四国',
     themes: ['事業承継', 'ロボティクス'],
     companies: 29,
     signal: '黒字の地場製造業で事業承継が進み、ロボティクス導入によるDXが加速している。',
   },
   {
-    id: 'kyushu',
-    en: 'Kyushu',
-    ja: '九州',
-    x: 132,
-    y: 402,
+    id: 'kyushu', en: 'Kyushu', ja: '九州',
     themes: ['半導体', '防衛'],
     companies: 87,
     signal: '「シリコンアイランド」の工場増設が、現状どの英語スクリーンにも映らないサプライヤー群を動かしている。',
   },
 ]
+
+// 実地図データの座標をマージ（JapanMap の viewBox 0 0 438 516 に一致）
+export const REGIONS = REGION_CONTENT.map((r) => ({
+  ...r,
+  ...REGION_NODES[r.id],
+}))
 
 export const LAYERS = [
   {

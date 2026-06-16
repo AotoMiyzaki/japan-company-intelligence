@@ -1,116 +1,48 @@
 import { REGIONS } from '../data'
+import { JAPAN_VIEWBOX, PREFECTURE_PATHS } from '../japan-geo'
 
-// ── 日本列島シルエット ──────────────────────────────────────────────
-// viewBox 0 0 500 590。経緯線近似の簡略アウトラインで、
-// 4島（北海道・本州・四国・九州）が一目で「日本」と分かるよう設計。
-// 全て時計回りの単純クローズドパス。
-
-const HOKKAIDO = `
-  M 318,82 C 318,62 332,46 355,40 C 380,34 410,44 432,64
-  C 452,82 458,108 446,130 C 434,150 410,162 384,160
-  C 356,158 326,144 312,124 C 300,106 306,94 318,82 Z
-`
-
-// 本州：東北NE端 → 関東 → 紀伊半島 → 近畿 → 中国地方 → SW端、
-//        日本海側を北東へ戻る（能登半島を含む）
-const HONSHU = `
-  M 352,154
-  C 362,144 378,142 394,152
-  C 412,164 422,186 428,212
-  C 434,238 432,262 424,282
-  C 414,302 398,314 386,322
-  C 372,330 356,332 344,340
-  C 332,350 322,364 316,382
-  C 310,398 318,414 330,414
-  C 342,414 352,404 354,390
-  C 356,374 348,360 336,356
-  C 320,352 300,354 280,356
-  C 258,358 236,356 214,356
-  C 190,358 166,362 144,364
-  C 122,366 98,364 80,356
-  C 62,346 60,330 74,318
-  C 90,306 116,300 142,294
-  C 166,288 188,282 202,270
-  C 212,260 208,246 198,240
-  C 188,234 176,238 172,250
-  C 168,262 174,276 186,280
-  C 200,284 218,278 232,268
-  C 250,256 262,236 268,216
-  C 274,196 270,172 278,156
-  C 288,138 312,132 336,140
-  C 346,144 350,150 352,154 Z
-`
-
-const SHIKOKU = `
-  M 196,368 C 214,358 244,358 268,370
-  C 290,382 298,402 286,418
-  C 274,434 246,440 220,434
-  C 194,426 178,408 186,392
-  C 188,380 192,372 196,368 Z
-`
-
-const KYUSHU = `
-  M 80,354 C 100,342 128,342 152,356
-  C 174,370 182,396 174,420
-  C 166,442 142,456 116,452
-  C 90,448 70,428 68,404
-  C 66,380 72,360 80,354 Z
-`
-
-// 離島（対馬など）— 小さい円で示すのみ
-const SMALL_ISLANDS = [
-  { cx: 58, cy: 302, r: 7,  label: '対馬' },
-  { cx: 44, cy: 328, r: 5,  label: '壱岐' },
-]
-
-// ── 地域ノードに光の柱（ビーコン） ───────────────────────────────────
-function Beacon({ r, i, isActive, animateBeacons }) {
-  const beamHeight = 60
-  const style = animateBeacons
-    ? { animation: `beacon-rise 0.8s ease ${0.8 + i * 0.22}s both` }
+// 地域ビーコン（光の柱 + ノード + pingリング）
+function Beacon({ r, i, isActive, animateBeacons, tone }) {
+  const beamHeight = 34
+  const c = tone.beacon
+  const beamStyle = animateBeacons
+    ? { animation: `beacon-rise 0.7s ease ${0.9 + i * 0.18}s both`, transformOrigin: 'bottom' }
     : undefined
-  const fadeStyle = animateBeacons
-    ? { animation: `fade-in 0.6s ease ${0.7 + i * 0.22}s both` }
+  const groupStyle = animateBeacons
+    ? { animation: `fade-in 0.5s ease ${0.8 + i * 0.18}s both` }
     : undefined
 
   return (
-    <g style={fadeStyle}>
-      {/* 薄い光柱（上向き） */}
+    <g style={groupStyle}>
+      {/* 光の柱 */}
       <rect
-        x={r.x - 1}
+        x={r.x - 0.7}
         y={r.y - beamHeight}
-        width={2}
+        width={1.4}
         height={beamHeight}
-        fill={`url(#beamGrad${i})`}
-        style={style}
+        fill={`url(#beam-${tone.id})`}
+        style={beamStyle}
       />
-      {/* ノード外周グロー */}
+      {/* 外周グロー */}
+      <circle cx={r.x} cy={r.y} r={isActive ? 11 : 7} fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
+      {/* pingリング */}
       <circle
-        cx={r.x}
-        cy={r.y}
-        r={isActive ? 20 : 14}
-        fill="#000E99"
-        fillOpacity={isActive ? 0.12 : 0.07}
-        className="transition-all duration-200"
-      />
-      {/* Pingリング */}
-      <circle
-        cx={r.x} cy={r.y} r={5}
-        fill="none" stroke="#000E99" strokeWidth="1"
+        cx={r.x} cy={r.y} r={3}
+        fill="none" stroke={c} strokeWidth="0.7"
         style={{
           transformOrigin: `${r.x}px ${r.y}px`,
-          animation: `ping-ring 3s ease-out infinite`,
-          animationDelay: `${1.2 + i * 0.28}s`,
+          animation: 'ping-ring 3s ease-out infinite',
+          animationDelay: `${1.3 + i * 0.24}s`,
           opacity: 0,
         }}
       />
       {/* ノード本体 */}
       <circle
         cx={r.x} cy={r.y}
-        r={isActive ? 6 : 4.5}
-        fill={isActive ? '#000E99' : '#fff'}
-        stroke="#000E99"
-        strokeWidth={1.8}
+        r={isActive ? 3.4 : 2.4}
+        fill={isActive ? c : tone.nodeFill}
+        stroke={c}
+        strokeWidth={1}
         className="transition-all duration-200"
       />
     </g>
@@ -118,17 +50,20 @@ function Beacon({ r, i, isActive, animateBeacons }) {
 }
 
 /**
- * 日本列島産業シグナルマップ（共有コンポーネント）
+ * 日本列島 産業シグナルマップ（共有）。
+ * @svg-maps/japan 由来の47都道府県パスを正確なアウトラインとして描画する。
  *
  * props:
+ *  variant        — 'dark'（FV用）| 'light'（白背景セクション用）
  *  lit            — 地域ノード/ビーコンを表示
- *  animateBeacons — 順次フェードイン+ビーコン演出
+ *  animateBeacons — 順次フェードイン演出
  *  interactive    — ホバー/クリック有効
  *  activeRegion   — ハイライト中の地域ID
  *  onRegionEnter / onRegionLeave / onRegionSelect
  *  showLabels     — ラベル常時表示
  */
 export default function JapanMap({
+  variant = 'light',
   lit = true,
   animateBeacons = false,
   interactive = false,
@@ -139,83 +74,89 @@ export default function JapanMap({
   showLabels = false,
   className = '',
 }) {
+  const tone = variant === 'dark'
+    ? {
+        id: 'dark',
+        land: '#0E1A3A',
+        landStroke: '#3B6FE0',
+        landStrokeOpacity: 0.55,
+        grid: '#5B8DEF',
+        gridOpacity: 0.07,
+        link: '#5B8DEF',
+        linkOpacity: 0.3,
+        beacon: '#7DB0FF',
+        nodeFill: '#0A1330',
+        label: '#9FB8E8',
+        labelActive: '#CFE0FF',
+      }
+    : {
+        id: 'light',
+        land: '#E9EDF8',
+        landStroke: '#000E99',
+        landStrokeOpacity: 0.45,
+        grid: '#000E99',
+        gridOpacity: 0.06,
+        link: '#000E99',
+        linkOpacity: 0.2,
+        beacon: '#000E99',
+        nodeFill: '#FFFFFF',
+        label: '#4C5567',
+        labelActive: '#000E99',
+      }
+
   return (
-    <svg
-      viewBox="0 0 500 590"
-      className={className}
-      role="img"
-      aria-label="日本列島の産業シグナルマップ（8地域）"
-    >
+    <svg viewBox={JAPAN_VIEWBOX} className={className} role="img" aria-label="日本列島の産業シグナルマップ（8地域）">
       <defs>
-        {/* 各ビーコンの上方向グラデーション */}
-        {REGIONS.map((r, i) => (
-          <linearGradient key={i} id={`beamGrad${i}`} x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#000E99" stopOpacity="0" />
-            <stop offset="100%" stopColor="#000E99" stopOpacity="0.55" />
-          </linearGradient>
-        ))}
-        {/* 島の薄いグロー */}
-        <filter id="islandGlow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+        <linearGradient id={`beam-${tone.id}`} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity="0" />
+          <stop offset="100%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.85 : 0.5} />
+        </linearGradient>
+        <radialGradient id={`glow-${tone.id}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.55 : 0.2} />
+          <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
+        </radialGradient>
       </defs>
 
-      {/* ── 経緯線グリッド（控えめ） ── */}
-      <g stroke="#000E99" strokeOpacity="0.06" strokeWidth="0.8">
-        {[125, 250, 375].map(x => (
-          <line key={`v${x}`} x1={x} y1="10" x2={x} y2="575" />
+      {/* 経緯線グリッド */}
+      <g stroke={tone.grid} strokeOpacity={tone.gridOpacity} strokeWidth="0.6">
+        {[110, 220, 330].map((x) => (
+          <line key={`v${x}`} x1={x} y1="0" x2={x} y2="516" />
         ))}
-        {[100, 200, 300, 400, 500].map(y => (
-          <line key={`h${y}`} x1="10" y1={y} x2="490" y2={y} />
+        {[90, 180, 270, 360, 450].map((y) => (
+          <line key={`h${y}`} x1="0" y1={y} x2="438" y2={y} />
         ))}
       </g>
 
-      {/* ── 日本列島シルエット（4島） ── */}
+      {/* 日本列島（47都道府県を束ねたアウトライン） */}
       <g
-        fill="#EEF1FA"
-        stroke="#000E99"
-        strokeOpacity="0.5"
-        strokeWidth="1.4"
+        fill={tone.land}
+        stroke={tone.landStroke}
+        strokeOpacity={tone.landStrokeOpacity}
+        strokeWidth="0.5"
         strokeLinejoin="round"
-        filter="url(#islandGlow)"
       >
-        <path d={HOKKAIDO} />
-        <path d={HONSHU} />
-        <path d={SHIKOKU} />
-        <path d={KYUSHU} />
-      </g>
-
-      {/* 小離島 */}
-      <g fill="#EEF1FA" stroke="#000E99" strokeOpacity="0.4" strokeWidth="1">
-        {SMALL_ISLANDS.map(isle => (
-          <circle key={isle.label} cx={isle.cx} cy={isle.cy} r={isle.r} />
+        {PREFECTURE_PATHS.map((d, i) => (
+          <path key={i} d={d} />
         ))}
       </g>
 
-      {/* ── 地域間の接続線 ── */}
+      {/* 地域間の接続線 */}
       {lit && (
-        <g stroke="#000E99" strokeOpacity="0.18" strokeWidth="0.9" fill="none" strokeDasharray="4 5">
+        <g stroke={tone.link} strokeOpacity={tone.linkOpacity} strokeWidth="0.7" fill="none" strokeDasharray="3 4">
           {REGIONS.slice(0, -1).map((r, i) => {
             const next = REGIONS[i + 1]
             return (
               <line
                 key={r.id}
                 x1={r.x} y1={r.y} x2={next.x} y2={next.y}
-                style={animateBeacons
-                  ? { animation: `fade-in 0.7s ease ${0.5 + i * 0.16}s both` }
-                  : undefined
-                }
+                style={animateBeacons ? { animation: `fade-in 0.6s ease ${0.6 + i * 0.14}s both` } : undefined}
               />
             )
           })}
         </g>
       )}
 
-      {/* ── 地域ビーコン ── */}
+      {/* 地域ビーコン */}
       {lit && REGIONS.map((r, i) => {
         const isActive = activeRegion === r.id
         return (
@@ -226,16 +167,14 @@ export default function JapanMap({
             onMouseLeave={interactive ? () => onRegionLeave?.(r.id) : undefined}
             onClick={interactive ? () => onRegionSelect?.(r.id) : undefined}
           >
-            <Beacon r={r} i={i} isActive={isActive} animateBeacons={animateBeacons} />
-            {interactive && (
-              <circle cx={r.x} cy={r.y} r={28} fill="transparent" />
-            )}
+            <Beacon r={r} i={i} isActive={isActive} animateBeacons={animateBeacons} tone={tone} />
+            {interactive && <circle cx={r.x} cy={r.y} r={16} fill="transparent" />}
             {(showLabels || isActive) && (
               <text
-                x={r.x + 13} y={r.y + 4}
-                fontSize="13" fontWeight="600"
+                x={r.x + 7} y={r.y + 2.5}
+                fontSize="8.5" fontWeight="600"
                 fontFamily="Inter, 'Noto Sans JP', sans-serif"
-                fill={isActive ? '#000E99' : '#4C5567'}
+                fill={isActive ? tone.labelActive : tone.label}
                 className="select-none transition-colors duration-200"
               >
                 {r.ja}
