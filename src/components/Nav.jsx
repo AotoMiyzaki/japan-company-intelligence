@@ -26,8 +26,8 @@ export default function Nav() {
     >
       <nav className="container-x flex h-16 items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5">
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
-          <span className="font-display text-sm font-semibold tracking-tight text-ink">
+          <span className={`inline-flex h-2.5 w-2.5 rounded-full transition-colors duration-300 ${scrolled ? 'bg-accent' : 'bg-[#7DB0FF]'}`} />
+          <span className={`font-display text-sm font-semibold tracking-tight transition-colors duration-300 ${scrolled ? 'text-ink' : 'text-white'}`}>
             Japan Company Intelligence
           </span>
         </a>
@@ -37,7 +37,7 @@ export default function Nav() {
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-ink-muted transition-colors hover:text-accent"
+              className={`text-sm transition-colors duration-300 ${scrolled ? 'text-ink-muted hover:text-accent' : 'text-white/70 hover:text-white'}`}
             >
               {l.label}
             </a>
@@ -46,7 +46,11 @@ export default function Nav() {
 
         <a
           href="#access"
-          className="rounded-full border border-accent/40 px-4 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
+          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors duration-300 ${
+            scrolled
+              ? 'border-accent/40 text-accent hover:bg-accent hover:text-white'
+              : 'border-white/30 text-white hover:border-white hover:bg-white/10'
+          }`}
         >
           早期アクセス
         </a>

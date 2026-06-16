@@ -4,13 +4,14 @@ import { usePrefersReducedMotion } from '../hooks'
 import JapanMap from './JapanMap'
 
 // ── フェーズ（マウントからの ms） ───────────────────────────────
-// 0: 静止  1: テーマが軌道上を回転  2: 回転しながら中心へ収束(列島へ接続)
-// 3: 日本列島出現・ビーコン点灯  4: テーマ消去  5: メイン  6: サブ  7: CTA
-const TIMELINE = [600, 3400, 4900, 6200, 7300, 8300, 9300]
+// 0: 静止  1: テーマが軌道上を回転  2: 収束(中心へ吸い込まれる)
+// 3: 中心で青い発光（チップ消去）  4: 発光から列島出現・ビーコン点灯
+// 5: 発光消去  6: メイン  7: サブ  8: CTA
+const TIMELINE = [600, 3400, 4800, 5100, 5500, 6400, 7400, 8400]
 
 const N = FV_THEMES.length
 const ORBIT_SPEED = 0.22   // rad/s（ゆっくり）
-const CONVERGE_MS = 1400   // 中心へ吸い込まれる時間
+const CONVERGE_MS = 750    // 中心へ吸い込まれる時間
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
@@ -83,12 +84,14 @@ export default function Hero() {
 
   const showOrbit  = phase >= 1
   const converging = phase >= 2
-  const showMap    = phase >= 3
-  const themesGone = phase >= 4
-  const mapDimmed  = phase >= 5
-  const showMain   = phase >= 5
-  const showSub    = phase >= 6
-  const showCTA    = phase >= 7
+  const showFlash  = phase >= 3
+  const themesGone = phase >= 3
+  const showMap    = phase >= 4
+  const flashGone  = phase >= 5
+  const mapDimmed  = phase >= 6
+  const showMain   = phase >= 6
+  const showSub    = phase >= 7
+  const showCTA    = phase >= 8
 
   return (
     <header className="relative isolate min-h-[100svh] overflow-hidden bg-[#06091A] text-white">
@@ -157,6 +160,25 @@ export default function Hero() {
             </div>
           ))}
         </div>
+
+        {/* 中心フラッシュ（収束完了時の青い発光） */}
+        <div
+          className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{
+            width: showFlash && !flashGone ? (showMap ? '280px' : '120px') : '0px',
+            height: showFlash && !flashGone ? (showMap ? '280px' : '120px') : '0px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(125,176,255,0.9) 0%, rgba(91,141,239,0.5) 30%, rgba(42,60,214,0.2) 65%, transparent 100%)',
+            opacity: showFlash && !flashGone ? 1 : 0,
+            transition: showFlash
+              ? flashGone
+                ? 'opacity 0.6s ease, width 0.6s ease, height 0.6s ease'
+                : 'opacity 0.25s ease, width 0.4s cubic-bezier(0.16,1,0.3,1), height 0.4s cubic-bezier(0.16,1,0.3,1)'
+              : 'none',
+            filter: 'blur(2px)',
+          }}
+          aria-hidden="true"
+        />
 
         {/* 日本列島（ダーク版） */}
         <div
