@@ -130,8 +130,9 @@ export default function Hero() {
 
         {/* 列島本体＋オーバーレイ（中央配置） */}
         <div
-          className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-[48%]"
           style={{
+            left: mobile ? '44%' : '50%',
             width: 'min(460px, 76vw)',
             aspectRatio: '438 / 516',
             opacity: mapLit ? 1 : 0.35,
