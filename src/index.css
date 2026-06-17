@@ -72,20 +72,7 @@
   100% { transform: scaleY(1); opacity: 0.85; transform-origin: bottom; }
 }
 
-/* 起動スキャンライン（上→下に列島を照らす光の帯） */
-@keyframes map-scan {
-  0%   { transform: translateY(-115%); opacity: 0; }
-  12%  { opacity: 1; }
-  88%  { opacity: 1; }
-  100% { transform: translateY(215%);  opacity: 0; }
-}
 
-/* 差し込む光のスイープ（斜めに走る光条） */
-@keyframes light-sweep {
-  0%   { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
-  18%  { opacity: 0.9; }
-  100% { transform: translateX(160%)  skewX(-18deg); opacity: 0; }
-}
 
 /* 周囲の光粒の点滅 */
 @keyframes twinkle {

@@ -43,7 +43,6 @@ export default function Hero() {
   }, [reduced])
 
   const mapLit    = phase >= 1
-  const igniting  = phase >= 1   // スイープ／スキャン（一度きり）
   const beaconsOn = phase >= 2
   const flowOn    = phase >= 2
   const showMain  = phase >= 3
@@ -116,11 +115,11 @@ export default function Hero() {
           style={{
             width: 'min(460px, 76vw)',
             aspectRatio: '438 / 516',
-            opacity: mapLit ? 1 : 0.5,
+            opacity: mapLit ? 1 : 0.35,
             transform: `translate(-50%, -50%) scale(${mapLit ? 1 : 0.95})`,
             filter: mapLit
-              ? 'drop-shadow(0 0 36px rgba(91,141,239,0.55)) drop-shadow(0 0 12px rgba(125,176,255,0.3)) brightness(1)'
-              : 'drop-shadow(0 0 10px rgba(91,141,239,0.2)) brightness(0.5)',
+              ? 'drop-shadow(0 0 40px rgba(91,141,239,0.65)) drop-shadow(0 0 14px rgba(125,176,255,0.35)) brightness(1.05)'
+              : 'drop-shadow(0 0 6px rgba(91,141,239,0.15)) brightness(0.28)',
             transition: 'opacity 1.5s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1), filter 1.5s ease',
           }}
         >
@@ -154,37 +153,6 @@ export default function Hero() {
               />
             ))}
           </svg>
-
-          {/* 差し込む光のスイープ（点灯時に一度走る斜めの光条） */}
-          {igniting && !reduced && (
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div
-                className="absolute inset-y-0"
-                style={{
-                  left: '-20%',
-                  width: '40%',
-                  background:
-                    'linear-gradient(90deg, transparent, rgba(160,210,255,0.55), rgba(125,176,255,0.85), rgba(160,210,255,0.55), transparent)',
-                  filter: 'blur(3px)',
-                  animation: 'light-sweep 1.4s cubic-bezier(0.3,0,0.4,1) forwards',
-                }}
-              />
-            </div>
-          )}
-
-          {/* 起動スキャンライン（上→下に列島を照らす） */}
-          {igniting && !reduced && (
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div
-                className="absolute inset-x-0 top-0 h-1/2"
-                style={{
-                  background:
-                    'linear-gradient(to bottom, transparent 0%, rgba(91,141,239,0.06) 40%, rgba(125,176,255,0.5) 50%, rgba(91,141,239,0.06) 60%, transparent 100%)',
-                  animation: 'map-scan 1.9s cubic-bezier(0.25,0.8,0.35,1) 0.2s forwards',
-                }}
-              />
-            </div>
-          )}
         </div>
       </div>
 
