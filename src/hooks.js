@@ -15,6 +15,21 @@ export function usePrefersReducedMotion() {
   return reduced
 }
 
+// True on narrow viewports (<=768px). Used to serve a lighter FV on mobile.
+export function useIsMobile(maxWidth = 768) {
+  const [mobile, setMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${maxWidth}px)`)
+    setMobile(mq.matches)
+    const handler = (e) => setMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [maxWidth])
+
+  return mobile
+}
+
 // Adds `.is-visible` to a `.reveal` element the first time it scrolls into view.
 export function useReveal(options = {}) {
   const ref = useRef(null)

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { usePrefersReducedMotion } from '../hooks'
+import { usePrefersReducedMotion, useIsMobile } from '../hooks'
 import JapanMap from './JapanMap'
 
 // ── フェーズ（マウントからの ms） ───────────────────────────────
@@ -40,13 +40,25 @@ const ORBIT_TILT = 45   // 度。正値=時計回り=右上がり。楕円は対
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
+  const mobile = useIsMobile()
   const [phase, setPhase] = useState(0)
+  const [settled, setSettled] = useState(false)
 
   useEffect(() => {
-    if (reduced) { setPhase(5); return }
+    if (reduced) { setPhase(5); setSettled(true); return }
     const timers = TIMELINE.map((t, i) => setTimeout(() => setPhase(i + 1), t))
+    // FV演出が出揃った後、常時ループを落ち着かせる
+    timers.push(setTimeout(() => setSettled(true), TIMELINE[TIMELINE.length - 1] + 3000))
     return () => timers.forEach(clearTimeout)
   }, [reduced])
+
+  // モバイルは演出を軽量化し、出揃った後はループ系を停止する
+  const lite = mobile
+  const loopsOn = !reduced && !(mobile && settled)
+
+  // 軽量モードの調整値
+  const particles = lite ? PARTICLES.slice(0, 10) : PARTICLES
+  const rings = lite ? ORBIT_RINGS.slice(0, 1) : ORBIT_RINGS
 
   const mapLit    = phase >= 1
   const beaconsOn = phase >= 2
@@ -96,7 +108,7 @@ export default function Hero() {
           className="absolute inset-0"
           style={{ opacity: mapLit ? 1 : 0.35, transition: 'opacity 1.6s ease' }}
         >
-          {PARTICLES.map((p, i) => (
+          {particles.map((p, i) => (
             <span
               key={i}
               className="absolute rounded-full"
@@ -109,7 +121,8 @@ export default function Hero() {
                 boxShadow: p.big
                   ? '0 0 8px 2px rgba(125,176,255,0.9), 0 0 16px 3px rgba(91,141,239,0.5)'
                   : '0 0 5px 1px rgba(125,176,255,0.7)',
-                animation: `twinkle ${p.dur}s ease-in-out ${p.delay}s infinite`,
+                opacity: loopsOn ? undefined : 0.5,
+                animation: loopsOn ? `twinkle ${p.dur}s ease-in-out ${p.delay}s infinite` : 'none',
               }}
             />
           ))}
@@ -124,13 +137,22 @@ export default function Hero() {
             opacity: mapLit ? 1 : 0.35,
             transform: `translate(-50%, -50%) scale(${mapLit ? 1 : 0.95})`,
             filter: mapLit
-              ? 'drop-shadow(0 0 40px rgba(91,141,239,0.65)) drop-shadow(0 0 14px rgba(125,176,255,0.35)) brightness(1.05)'
+              ? (lite
+                  ? 'drop-shadow(0 0 16px rgba(91,141,239,0.5)) brightness(1.04)'
+                  : 'drop-shadow(0 0 40px rgba(91,141,239,0.65)) drop-shadow(0 0 14px rgba(125,176,255,0.35)) brightness(1.05)')
               : 'drop-shadow(0 0 6px rgba(91,141,239,0.15)) brightness(0.28)',
             transition: 'opacity 1.5s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1), filter 1.5s ease',
           }}
         >
           {/* 日本列島SVG（正確な47都道府県） */}
-          <JapanMap variant="dark" className="h-full w-full" lit={mapLit} animateBeacons={!reduced && beaconsOn} />
+          <JapanMap
+            variant="dark"
+            className="h-full w-full"
+            lit={mapLit}
+            animateBeacons={!reduced && beaconsOn}
+            lite={lite}
+            pingLoop={loopsOn}
+          />
 
           {/* 観測リング（日本列島を内包する連続した縦長楕円の点線軌道） */}
           <svg
@@ -148,7 +170,7 @@ export default function Hero() {
               </filter>
             </defs>
             <g transform={`rotate(${ORBIT_TILT} ${ORBIT_CX} ${ORBIT_CY})`}>
-              {ORBIT_RINGS.map((ring, i) => (
+              {rings.map((ring, i) => (
                 <ellipse
                   key={i}
                   cx={ORBIT_CX}
@@ -161,8 +183,8 @@ export default function Hero() {
                   strokeOpacity={ring.op}
                   strokeDasharray={ring.dash}
                   strokeLinecap="round"
-                  filter="url(#orbit-soft)"
-                  style={{ animation: `flow-dash ${ring.dur}s linear infinite` }}
+                  filter={lite ? undefined : 'url(#orbit-soft)'}
+                  style={{ animation: loopsOn ? `flow-dash ${ring.dur}s linear infinite` : 'none' }}
                 />
               ))}
             </g>

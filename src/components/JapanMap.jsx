@@ -2,7 +2,8 @@ import { REGIONS } from '../data'
 import { JAPAN_VIEWBOX, PREFECTURE_PATHS } from '../japan-geo'
 
 // 地域ビーコン（光の柱 + ノード + pingリング）
-function Beacon({ r, i, isActive, animateBeacons, tone }) {
+// lite=true: モバイル軽量モード。グロー層を減らし、pingは1重、ループは抑制。
+function Beacon({ r, i, isActive, animateBeacons, tone, lite = false, pingLoop = true }) {
   const beamHeight = 42
   const c = tone.beacon
   const beamStyle = animateBeacons
@@ -14,7 +15,7 @@ function Beacon({ r, i, isActive, animateBeacons, tone }) {
 
   return (
     <g style={groupStyle}>
-      {/* 光の柱（幅2px、明るく） */}
+      {/* 光の柱 */}
       <rect
         x={r.x - 1}
         y={r.y - beamHeight}
@@ -23,33 +24,40 @@ function Beacon({ r, i, isActive, animateBeacons, tone }) {
         fill={`url(#beam-${tone.id})`}
         style={beamStyle}
       />
-      {/* 外周グロー（三層） */}
-      <circle cx={r.x} cy={r.y} r={isActive ? 22 : 16} fill={`url(#glow-far-${tone.id})`} className="transition-all duration-200" />
-      <circle cx={r.x} cy={r.y} r={isActive ? 13 : 9}  fill={`url(#glow-outer-${tone.id})`} className="transition-all duration-200" />
-      <circle cx={r.x} cy={r.y} r={isActive ? 7 : 5}   fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
-      {/* pingリング（内） */}
-      <circle
-        cx={r.x} cy={r.y} r={3.5}
-        fill="none" stroke={c} strokeWidth="1"
-        style={{
-          transformOrigin: `${r.x}px ${r.y}px`,
-          animation: 'ping-ring 2.8s ease-out infinite',
-          animationDelay: `${1.2 + i * 0.22}s`,
-          opacity: 0,
-        }}
-      />
-      {/* pingリング（外、遅延） */}
-      <circle
-        cx={r.x} cy={r.y} r={3.5}
-        fill="none" stroke={c} strokeWidth="0.6"
-        style={{
-          transformOrigin: `${r.x}px ${r.y}px`,
-          animation: 'ping-ring-outer 3.4s ease-out infinite',
-          animationDelay: `${1.8 + i * 0.22}s`,
-          opacity: 0,
-        }}
-      />
-      {/* ノード本体 */}
+      {/* 外周グロー（lite=1層 / 通常=3層） */}
+      {!lite && (
+        <circle cx={r.x} cy={r.y} r={isActive ? 22 : 16} fill={`url(#glow-far-${tone.id})`} className="transition-all duration-200" />
+      )}
+      {!lite && (
+        <circle cx={r.x} cy={r.y} r={isActive ? 13 : 9}  fill={`url(#glow-outer-${tone.id})`} className="transition-all duration-200" />
+      )}
+      <circle cx={r.x} cy={r.y} r={isActive ? (lite ? 9 : 7) : (lite ? 7 : 5)} fill={`url(#glow-${tone.id})`} className="transition-all duration-200" />
+      {/* pingリング（内）。lite では外周pingを省略。pingLoop=false で停止。 */}
+      {pingLoop && (
+        <circle
+          cx={r.x} cy={r.y} r={3.5}
+          fill="none" stroke={c} strokeWidth="1"
+          style={{
+            transformOrigin: `${r.x}px ${r.y}px`,
+            animation: 'ping-ring 2.8s ease-out infinite',
+            animationDelay: `${1.2 + i * 0.22}s`,
+            opacity: 0,
+          }}
+        />
+      )}
+      {pingLoop && !lite && (
+        <circle
+          cx={r.x} cy={r.y} r={3.5}
+          fill="none" stroke={c} strokeWidth="0.6"
+          style={{
+            transformOrigin: `${r.x}px ${r.y}px`,
+            animation: 'ping-ring-outer 3.4s ease-out infinite',
+            animationDelay: `${1.8 + i * 0.22}s`,
+            opacity: 0,
+          }}
+        />
+      )}
+      {/* ノード本体（lite ではdrop-shadowを1層に） */}
       <circle
         cx={r.x} cy={r.y}
         r={isActive ? 4 : 2.8}
@@ -57,7 +65,7 @@ function Beacon({ r, i, isActive, animateBeacons, tone }) {
         stroke={c}
         strokeWidth={1.4}
         className="transition-all duration-200"
-        style={{ filter: `drop-shadow(0 0 4px ${c}) drop-shadow(0 0 8px ${c})` }}
+        style={{ filter: lite ? `drop-shadow(0 0 3px ${c})` : `drop-shadow(0 0 4px ${c}) drop-shadow(0 0 8px ${c})` }}
       />
     </g>
   )
@@ -87,6 +95,8 @@ export default function JapanMap({
   onRegionSelect,
   showLabels = false,
   className = '',
+  lite = false,        // モバイル軽量: フィルター/グロー/ループを削減
+  pingLoop = true,     // 常時pingループ。FV完了後に false で停止可能
 }) {
   const tone = variant === 'dark'
     ? {
@@ -137,7 +147,7 @@ export default function JapanMap({
           <stop offset="0%" stopColor={tone.beacon} stopOpacity={variant === 'dark' ? 0.15 : 0.04} />
           <stop offset="100%" stopColor={tone.beacon} stopOpacity="0" />
         </radialGradient>
-        {variant === 'dark' && (
+        {variant === 'dark' && !lite && (
           <filter id="land-edge-glow" x="-2%" y="-2%" width="104%" height="104%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur" />
             <feMerge>
@@ -165,7 +175,7 @@ export default function JapanMap({
         strokeOpacity={tone.landStrokeOpacity}
         strokeWidth="0.6"
         strokeLinejoin="round"
-        filter={variant === 'dark' ? 'url(#land-edge-glow)' : undefined}
+        filter={variant === 'dark' && !lite ? 'url(#land-edge-glow)' : undefined}
       >
         {PREFECTURE_PATHS.map((d, i) => (
           <path key={i} d={d} />
@@ -199,7 +209,7 @@ export default function JapanMap({
             onMouseLeave={interactive ? () => onRegionLeave?.(r.id) : undefined}
             onClick={interactive ? () => onRegionSelect?.(r.id) : undefined}
           >
-            <Beacon r={r} i={i} isActive={isActive} animateBeacons={animateBeacons} tone={tone} />
+            <Beacon r={r} i={i} isActive={isActive} animateBeacons={animateBeacons} tone={tone} lite={lite} pingLoop={pingLoop} />
             {interactive && <circle cx={r.x} cy={r.y} r={16} fill="transparent" />}
             {(showLabels || isActive) && (
               <text
