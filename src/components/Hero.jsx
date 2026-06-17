@@ -54,7 +54,7 @@ export default function Hero() {
 
   // モバイルは演出を軽量化し、出揃った後はループ系を停止する
   const lite = mobile
-  const loopsOn = !reduced && !(mobile && settled)
+  const loopsOn = !reduced
 
   // 軽量モードの調整値
   const particles = lite ? PARTICLES.slice(0, 10) : PARTICLES
