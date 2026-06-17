@@ -35,7 +35,8 @@ const ORBIT_RINGS = [
 ]
 const ORBIT_CX = 255
 const ORBIT_CY = 198
-const ORBIT_TILT = 90   // 度。正値=時計回り=右上がり（列島の傾きに合わせる）
+const ORBIT_TILT = 45   // 度。正値=時計回り=右上がり。楕円は対称なので
+                        // 傾きが最も強く見えるのは45度（0/90度では傾いて見えない）
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
