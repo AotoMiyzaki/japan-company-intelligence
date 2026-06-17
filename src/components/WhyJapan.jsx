@@ -7,8 +7,8 @@ export default function WhyJapan() {
     <section id="why" className="container-x scroll-mt-24 py-24 sm:py-32">
       <SectionHeading
         eyebrow="なぜ今、日本か"
-        title="海外資本がまだ早期にいる、市場の再評価が進んでいる。"
-        lead="4つの構造変化が同時に起きている。機会の大半は、ヘッドラインのインデックスの水面下にある。"
+        title={<>日本市場を見る視点が、<span className="inline-block">いま変わり始めている。</span></>}
+        lead="資産運用改革、NISA拡充、ガバナンス改革、円安、事業承継が同時に進み、日本企業を見る視点が変わりつつあります。私たちは、その変化を公開情報に基づいて整理します。"
       />
 
       <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">

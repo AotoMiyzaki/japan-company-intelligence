@@ -7,8 +7,8 @@ export default function WhatWeSee() {
     <section id="layers" className="container-x scroll-mt-24 py-24 sm:py-32">
       <SectionHeading
         eyebrow="私たちが見ているもの"
-        title="3つのレイヤーで、日本企業を丸ごと捉える。"
-        lead="日本のカバレッジは大手上場企業で止まることが多い。私たちは3層の深さまで踏み込み、海外資本がほとんど届いていない市場の内側を映し出します。"
+        title={<>3つのレイヤーで、<span className="inline-block">日本企業を捉える。</span></>}
+        lead="日本企業の情報は、大手上場企業に偏りがちです。私たちは、上場企業、上場準備・有力未上場企業、地方・中小企業までを3つのレイヤーで整理し、英語情報だけでは見えにくい日本市場の内側を映し出します。"
       />
 
       <div className="mt-14 grid gap-5 md:grid-cols-3">

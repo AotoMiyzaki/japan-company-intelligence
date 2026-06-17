@@ -4,7 +4,7 @@ import { useReveal } from '../hooks'
 import JapanMap from './JapanMap'
 
 export default function InteractiveMap() {
-  const [selectedId, setSelectedId] = useState('kyushu')
+  const [selectedId, setSelectedId] = useState('hokkaido')
   const [hoverId, setHoverId] = useState(null)
 
   const activeId = hoverId || selectedId
@@ -22,8 +22,7 @@ export default function InteractiveMap() {
             8地域。ひとつの産業地図。
           </h2>
           <p className="mt-4 text-base leading-relaxed text-ink-muted sm:text-lg">
-            地域をホバー・タップすると、現場で動いているテーマ、追跡企業数、
-            現在のシグナルを確認できます。
+            地域をホバー・タップすると、主要な産業テーマ、調査対象企業数、現在の動向を確認できます。
           </p>
         </div>
 
@@ -59,7 +58,7 @@ export default function InteractiveMap() {
                   {region.companies}
                 </p>
                 <p className="text-[11px] uppercase tracking-[0.15em] text-ink-faint">
-                  追跡企業数
+                  調査対象企業数
                 </p>
               </div>
             </div>

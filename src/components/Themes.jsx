@@ -8,7 +8,7 @@ export default function Themes() {
       <div className="container-x">
         <SectionHeading
           eyebrow="産業テーマ"
-          title="世界の産業テーマを、日本の構造から読み解く。"
+          title={<>世界の産業テーマを、<span className="inline-block">日本の構造から読み解く。</span></>}
           lead="公開情報に基づき、半導体、AI、防衛、エネルギーなどの世界的な産業テーマを、日本の企業・地域・産業構造と結びつけて整理します。"
         />
 
