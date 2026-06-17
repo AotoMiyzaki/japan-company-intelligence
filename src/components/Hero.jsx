@@ -25,12 +25,15 @@ const PARTICLES = Array.from({ length: 34 }, (_, i) => {
   }
 })
 
-// 列島を囲うシグナル流線（438×516 座標系、海上を走る）
-const SIGNAL_ARCS = [
-  { d: 'M 408 24 C 470 170, 392 350, 196 372', w: 1.1, op: 0.5,  dash: '5 9',  dur: 5.5 },
-  { d: 'M 86 372 C 8 250, 116 78, 366 34',     w: 0.9, op: 0.38, dash: '4 10', dur: 7   },
-  { d: 'M 430 120 C 410 250, 300 330, 150 330',w: 0.7, op: 0.28, dash: '3 12', dur: 9   },
+// 日本列島を内包する観測リング（連続した閉じた縦長楕円）。
+// 列島が右肩上がりに伸びるため、やや右寄りの中心に置いて全体を内包する。
+// 438×516 座標系。複数本は別pathではなく同心の楕円なので途切れない。
+const ORBIT_RINGS = [
+  { rx: 196, ry: 240, w: 1.1, op: 0.5,  dash: '5 9',  dur: 26 },
+  { rx: 168, ry: 210, w: 0.7, op: 0.26, dash: '3 11', dur: 34 },
 ]
+const ORBIT_CX = 255
+const ORBIT_CY = 198
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
@@ -126,30 +129,36 @@ export default function Hero() {
           {/* 日本列島SVG（正確な47都道府県） */}
           <JapanMap variant="dark" className="h-full w-full" lit={mapLit} animateBeacons={!reduced && beaconsOn} />
 
-          {/* シグナル流線（列島を囲うエネルギー軌跡） */}
+          {/* 観測リング（日本列島を内包する連続した縦長楕円の点線軌道） */}
           <svg
             viewBox="0 0 438 516"
             className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
             style={{ opacity: flowOn ? 1 : 0, transition: 'opacity 1.2s ease' }}
           >
             <defs>
-              <linearGradient id="arc-grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#7DB0FF" stopOpacity="0.05" />
-                <stop offset="50%" stopColor="#7DB0FF" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#5B8DEF" stopOpacity="0.05" />
-              </linearGradient>
+              <filter id="orbit-soft" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
-            {SIGNAL_ARCS.map((arc, i) => (
-              <path
+            {ORBIT_RINGS.map((ring, i) => (
+              <ellipse
                 key={i}
-                d={arc.d}
+                cx={ORBIT_CX}
+                cy={ORBIT_CY}
+                rx={ring.rx}
+                ry={ring.ry}
                 fill="none"
-                stroke="url(#arc-grad)"
-                strokeWidth={arc.w}
-                strokeOpacity={arc.op}
-                strokeDasharray={arc.dash}
+                stroke="#9FC4FF"
+                strokeWidth={ring.w}
+                strokeOpacity={ring.op}
+                strokeDasharray={ring.dash}
                 strokeLinecap="round"
-                style={{ animation: `flow-dash ${arc.dur}s linear infinite` }}
+                filter="url(#orbit-soft)"
+                style={{ animation: `flow-dash ${ring.dur}s linear infinite` }}
               />
             ))}
           </svg>
