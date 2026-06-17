@@ -132,7 +132,7 @@ export default function Hero() {
         <div
           className="absolute top-[48%]"
           style={{
-            left: mobile ? '44%' : '50%',
+            left: mobile ? '47%' : '50%',
             width: 'min(460px, 76vw)',
             aspectRatio: '438 / 516',
             opacity: mapLit ? 1 : 0.35,
