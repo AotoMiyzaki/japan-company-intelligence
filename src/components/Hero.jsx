@@ -25,15 +25,33 @@ const PARTICLES = Array.from({ length: 34 }, (_, i) => {
   }
 })
 
-// 日本列島を内包する観測リング（連続した閉じた縦長楕円）。
-// 列島が右肩上がりに伸びるため、やや右寄りの中心に置いて全体を内包する。
-// 438×516 座標系。複数本は別pathではなく同心の楕円なので途切れない。
-const ORBIT_RINGS = [
-  { rx: 196, ry: 240, w: 1.1, op: 0.5,  dash: '5 9',  dur: 26 },
-  { rx: 168, ry: 210, w: 0.7, op: 0.26, dash: '3 11', dur: 34 },
+// 観測軌道パス（縦長の楕円を基本に、列島の対角線・太平洋側・九州周辺に沿って変形）
+// 438×516 座標系。時計回り、閉じたパス。
+// 北海道(373,56)〜九州(137,308) の対角形状に外周が反応するよう設計。
+const ORBIT_PATHS = [
+  {
+    // 外周リング: 太平洋側は右に膨らみ、北海道上で右肩上がり、九州〜四国で下に回り込む
+    d: [
+      'M 395,-45',                        // 北海道の北東上空
+      'C 495,30  492,210  355,425',       // 太平洋側（本州〜紀伊半島）
+      'C 270,490  90,470  -18,358',       // 底面（四国〜九州南端）
+      'C -75,258  -55,70  118,-42',       // 日本海側（対馬海峡〜東北西）
+      'C 218,-92  335,-72  395,-45 Z',    // 北面（宗谷〜北海道上空）
+    ].join(' '),
+    w: 1.1, op: 0.5, dash: '5 9', dur: 26,
+  },
+  {
+    // 内周リング: 外周より25px程度内側、微妙に異なる形で奥行き感を出す
+    d: [
+      'M 367,-20',
+      'C 458,46  455,200  328,398',
+      'C 250,458  90,440   4,338',
+      'C -48,248  -32,76   122,-20',
+      'C 214,-66  312,-50  367,-20 Z',
+    ].join(' '),
+    w: 0.7, op: 0.26, dash: '3 11', dur: 34,
+  },
 ]
-const ORBIT_CX = 255
-const ORBIT_CY = 198
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
@@ -144,13 +162,10 @@ export default function Hero() {
                 </feMerge>
               </filter>
             </defs>
-            {ORBIT_RINGS.map((ring, i) => (
-              <ellipse
+            {ORBIT_PATHS.map((ring, i) => (
+              <path
                 key={i}
-                cx={ORBIT_CX}
-                cy={ORBIT_CY}
-                rx={ring.rx}
-                ry={ring.ry}
+                d={ring.d}
                 fill="none"
                 stroke="#9FC4FF"
                 strokeWidth={ring.w}
