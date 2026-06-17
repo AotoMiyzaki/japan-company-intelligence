@@ -42,17 +42,7 @@
   }
 }
 
-/* ── FVアニメーション用キーフレーム ─────────────────────── */
-
-@keyframes orbit {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes counter-orbit {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(-360deg); }
-}
+/* ── FVアニメーション用キーフレーム（日本列島シグナルマップ） ── */
 
 @keyframes breathe {
   0%,100% { opacity: 0.45; transform: scale(1); }
@@ -64,70 +54,54 @@
   to   { opacity: 1; }
 }
 
+/* 地域ビーコンのpingリング（内・外） */
 @keyframes ping-ring {
   0%   { transform: scale(0.6); opacity: 0.8; }
   70%  { opacity: 0.3; }
   100% { transform: scale(3.2); opacity: 0; }
 }
-
 @keyframes ping-ring-outer {
   0%   { transform: scale(0.6); opacity: 0.5; }
   100% { transform: scale(5.0); opacity: 0; }
 }
 
+/* 光の柱が立ち上がる */
 @keyframes beacon-rise {
   0%   { transform: scaleY(0); opacity: 0; transform-origin: bottom; }
   50%  { opacity: 1; }
   100% { transform: scaleY(1); opacity: 0.85; transform-origin: bottom; }
 }
 
-/* ── 中心フラッシュ ─────────────────────────────────────── */
-@keyframes flash-core {
-  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
-  15%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-  50%  { opacity: 0.9; }
-  100% { opacity: 0; transform: translate(-50%,-50%) scale(3); }
-}
-@keyframes flash-ring {
-  0%   { opacity: 1;   transform: translate(-50%,-50%) scale(0.03); }
-  100% { opacity: 0;   transform: translate(-50%,-50%) scale(1); }
-}
-@keyframes flash-spike {
-  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
-  18%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%,-50%) scale(1); }
-}
-@keyframes crosshair-v {
-  0%   { opacity: 0; transform: translateX(-50%) scaleY(0.05); }
-  20%  { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-50%) scaleY(1); }
-}
-@keyframes crosshair-h {
-  0%   { opacity: 0; transform: translateY(-50%) scaleX(0.05); }
-  20%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
-}
-/* 散乱パーティクル（親がrotate、子がtranslateY = 外向き） */
-@keyframes scatter-p {
-  from { transform: translateY(0)     scale(2.5); opacity: 1; }
-  20%  {                               opacity: 1; }
-  60%  {                               opacity: 0.5; }
-  to   { transform: translateY(-80px) scale(0);   opacity: 0; }
-}
-/* エネルギー充電パルス（収束中の中心） */
-@keyframes energy-pulse {
-  0%,100% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.3; }
-  50%     { transform: translate(-50%,-50%) scale(1.5); opacity: 0.85; }
-}
-/* マップ起動スキャンライン */
+/* 起動スキャンライン（上→下に列島を照らす光の帯） */
 @keyframes map-scan {
-  from { transform: translateY(-100%); }
-  to   { transform: translateY(220%);  }
+  0%   { transform: translateY(-115%); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateY(215%);  opacity: 0; }
 }
-/* 軌道粒子パルス */
-@keyframes particle-pulse {
-  0%,100% { opacity: 0.25; transform: translate(-50%,-50%) scale(0.7); }
-  50%     { opacity: 1;    transform: translate(-50%,-50%) scale(1.5); }
+
+/* 差し込む光のスイープ（斜めに走る光条） */
+@keyframes light-sweep {
+  0%   { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
+  18%  { opacity: 0.9; }
+  100% { transform: translateX(160%)  skewX(-18deg); opacity: 0; }
+}
+
+/* 周囲の光粒の点滅 */
+@keyframes twinkle {
+  0%,100% { opacity: 0.12; transform: scale(0.7); }
+  50%     { opacity: 1;    transform: scale(1.25); }
+}
+
+/* 周囲をめぐるエネルギー流線（dash移動） */
+@keyframes flow-dash {
+  to { stroke-dashoffset: -400; }
+}
+
+/* 列島の輪郭が点灯していく呼吸 */
+@keyframes outline-glow {
+  0%,100% { opacity: 0.85; }
+  50%     { opacity: 1; }
 }
 
 /* ── スクロール出現 ─────────────────────────────────────── */
