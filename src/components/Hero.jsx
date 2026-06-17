@@ -35,7 +35,7 @@ const ORBIT_RINGS = [
 ]
 const ORBIT_CX = 255
 const ORBIT_CY = 198
-const ORBIT_TILT = -12   // 度。右肩上がりの列島に沿うわずかな傾き
+const ORBIT_TILT = 14   // 度。正値=時計回り=右上がり（列島の傾きに合わせる）
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
