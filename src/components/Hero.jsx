@@ -30,11 +30,11 @@ const PARTICLES = Array.from({ length: 34 }, (_, i) => {
 // 傾けて「ほんの少し日本に反応している」印象にする（形は崩さない）。
 // 438×516 座標系。同心の楕円なので途切れない。
 const ORBIT_RINGS = [
-  { rx: 196, ry: 240, w: 1.1, op: 0.5,  dash: '5 9',  dur: 26 },
-  { rx: 168, ry: 210, w: 0.7, op: 0.26, dash: '3 11', dur: 34 },
+  { rx: 250, ry: 300, w: 1.1, op: 0.5,  dash: '5 9',  dur: 26 },
+  { rx: 216, ry: 262, w: 0.7, op: 0.26, dash: '3 11', dur: 34 },
 ]
-const ORBIT_CX = 255
-const ORBIT_CY = 198
+const ORBIT_CX = 235
+const ORBIT_CY = 225
 const ORBIT_TILT = 45   // 度。正値=時計回り=右上がり。楕円は対称なので
                         // 傾きが最も強く見えるのは45度（0/90度では傾いて見えない）
 
